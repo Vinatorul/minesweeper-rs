@@ -7,7 +7,3 @@ license-file = "LICENSE"
 [dependencies]
 piston_window = "0.15.0"
 rand = "*"
-
-[features]
-# for building with nightly
-unstable=[]
