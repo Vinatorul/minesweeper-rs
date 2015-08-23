@@ -4,6 +4,23 @@ Simple minesweeper in Rust
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
 
+## Options
+
+Type `minesweeper -h` or look here: 
+
+```
+USAGE:
+    minesweeper [FLAGS] [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+        --height <height>    window height
+        --width <width>      window width
+```
+
 # How to Contribute
 
 Contributions are always welcome! Please use the following guidelines when contributing to `minesweeper`
