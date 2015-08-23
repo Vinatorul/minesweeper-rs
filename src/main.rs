@@ -1,5 +1,6 @@
 extern crate piston_window;
 extern crate clap;
+extern crate rand;
 
 mod game;
 mod field;
