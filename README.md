@@ -1,4 +1,4 @@
-# minesweeper-rs  [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs)
+# minesweeper-rs  [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs) [![license](http://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 Simple minesweeper in Rust
 
 ## License
