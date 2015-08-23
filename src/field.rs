@@ -7,7 +7,7 @@ pub enum Content {
     None
 }
 
-pub struct Cell {
+struct Cell {
     index: u32,
     content: Content,
     revealed: bool
@@ -26,8 +26,8 @@ impl Cell {
 
 pub struct Field {
     cells: Vec<Cell>,
-    pub width: u32,
-    pub height: u32,
+    width: u32,
+    height: u32,
     mines: u32
 }
 
@@ -56,7 +56,7 @@ impl Field {
         }
         for i in 0..self.width {
             for j in 0..self.height {           
-                match self.get_cell(i*self.width + j).content {
+                match self.get_cell(i + j*self.height).content {
                     Content::None => {
                         let mut ct : u8 = 0;
                         let i1 = i as i32;
@@ -86,8 +86,8 @@ impl Field {
                             ct += b;
                         } 
                         if ct > 0 {
-                            let w = self.width; // get w before mutually borrowing
-                            self.get_cell_mut(i*w + j).content = Content::Number(ct);
+                            let h = self.height; // get h before mutually borrowing
+                            self.get_cell_mut(i + j*h).content = Content::Number(ct);
                         }
                     },
                     _ => {}
@@ -106,6 +106,10 @@ impl Field {
         let cell = self.get_cell_mut(i);
         cell.reveal();
         &cell.content
+    }
+
+    pub fn revealed(&self, i: u32) -> bool {
+        self.get_cell(i).revealed
     }
 
     fn get_cell_mut(&mut self, i:u32) -> &mut Cell {
@@ -128,10 +132,28 @@ impl Field {
         } else if (j < 0) || ((j as u32) >= self.height) {
             None
         } else {
-            match self.get_cell((i as u32)*self.width + (j as u32)).content {
+            match self.get_cell((i as u32)+ (j as u32)*self.height).content {
                 Content::Bomb => Some(1),
                 _  => Some(0)
             }
         }
+    }
+
+    pub fn get_width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn get_height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn restart(&mut self) {
+        self.fill();
+    } 
+
+    pub fn reveal_all(&mut self) {
+      for i in 0..self.width*self.height {
+            self.get_cell_mut(i).revealed = true;
+        }  
     }
 }

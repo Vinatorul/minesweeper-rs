@@ -44,8 +44,12 @@ fn main() {
     for e in window {
         game.render(&e);
 
+        if let Some(mouse_rel) = e.mouse_cursor_args() {
+            game.mouse_move(mouse_rel);
+        }
+
         if let Some(button) = e.press_args() {
-            game.proc_key(button);
+            game.proc_key(button, &e);
         }
     }
 }
