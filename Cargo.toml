@@ -1,0 +1,9 @@
+[package]
+name = "minesweeper"
+version = "0.1.0"
+authors = ["Alexander Kuvaev <alexander@kuvaev.me>"]
+license-file = "LICENSE"
+
+[dependencies]
+piston_window = "0.15.0"
+rand = "*"
