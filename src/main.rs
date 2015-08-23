@@ -1,6 +1,7 @@
 extern crate piston_window;
 extern crate clap;
 extern crate rand;
+extern crate find_folder;
 
 mod game;
 mod field;
@@ -17,8 +18,8 @@ fn main() {
         .arg(Arg::from_usage("--height [height] 'window height'"))
         .get_matches();
 
-    let mut width = 640;
-    let mut height = 480;
+    let mut width = 600;
+    let mut height = 600;
     if let Some(w) = matches.value_of("width") {
         width = w.parse().unwrap_or(width);
     }
@@ -32,7 +33,13 @@ fn main() {
         .build()
         .unwrap();
 
-    let game = game::Game::new();
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets").unwrap();
+    let ref font = assets.join("FiraSans-Regular.ttf");
+    let factory = window.factory.borrow().clone();
+    let glyphs = Glyphs::new(font, factory).unwrap();
+
+    let mut game = game::Game::new(glyphs);
 
     for e in window {
         game.render(&e);
