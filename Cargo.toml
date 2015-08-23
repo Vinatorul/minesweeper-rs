@@ -8,5 +8,6 @@ license-file = "LICENSE"
 piston_window = "0.15.0"
 rand = "*"
 
-# for building with nightly and unstable features
+[features]
+# for building with nightly
 unstable=[]
