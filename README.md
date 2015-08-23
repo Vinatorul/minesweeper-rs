@@ -1,5 +1,5 @@
 # minesweeper-rs
-Simple minesweeper in Rust
+Simple minesweeper in Rust [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs)
 
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
