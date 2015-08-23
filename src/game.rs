@@ -72,12 +72,12 @@ impl Game {
             Button::Mouse(btn) => {
                 match btn {
                     MouseButton::Left => {
-                        let w = window.size().width as f64;
-                        let h = window.size().height as f64;
-                        let cell_h = h / (self.field.get_height() as f64);
-                        let cell_w = w / (self.field.get_width() as f64);
-                        let x = (self.mouse_x/cell_w).floor() as u32; 
-                        let y = (self.mouse_y/cell_h).floor() as u32;
+                        let w = window.size().width;
+                        let h = window.size().height;
+                        let cell_h = h / self.field.get_height();
+                        let cell_w = w / self.field.get_width();
+                        let x = (self.mouse_x.floor() as u32)/cell_w; 
+                        let y = (self.mouse_y.floor() as u32)/cell_h;
                         let h = self.field.get_height();
                         self.open_cell(x + y*h);
                     },
