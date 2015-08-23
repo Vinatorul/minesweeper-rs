@@ -6,4 +6,5 @@ license-file = "LICENSE"
 
 [dependencies]
 piston_window = "0.15.0"
+clap = "1.2"
 rand = "*"
