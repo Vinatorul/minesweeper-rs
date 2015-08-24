@@ -4,9 +4,17 @@ Simple minesweeper in Rust
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
 
+## Compiling
+
+Follow these instructions to compile `cargo-count`, then skip down to Installation.
+
+ 1. Clone the project `$ git clone https://github.com/Vinatorul/minesweeper-rs && cd minesweeper-rs`
+ 2. Build the project `$ cargo build --release` (**NOTE:** There is a large performance differnce when compiling without optimizations, so I recommend alwasy using `--release` to enable to them)
+ 3. Once complete, the binary will be located at `target/release/minesweeper`
+
 ## Options
 
-Type `minesweeper -h` or look here: 
+Pass `-h` to arguments or look here: 
 
 ```
 USAGE:
