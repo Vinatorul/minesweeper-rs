@@ -4,7 +4,8 @@ Simple minesweeper in Rust
 ## How to Play
 
 There are 50 bombs for the 20x20 field.
-Contols:
+
+Controls:
 * `R` - restart
 * `LMB` click - open a cell
 
