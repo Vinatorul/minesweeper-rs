@@ -3,7 +3,7 @@ Simple minesweeper in Rust
 
 ## How to Play
 
-There are 50 bombs for the 20x20 field.
+There are up to 50 bombs for the 20x15 field.
 
 Controls:
 * `R` - restart
