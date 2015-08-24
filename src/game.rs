@@ -11,7 +11,7 @@ pub struct Game {
 impl Game {
     pub fn new(glyphs: Glyphs) -> Game {
         Game {
-            field: Field::new(20, 25, 50),
+            field: Field::new(20, 15, 50),
             glyphs: glyphs,
             mouse_x: 0.0,
             mouse_y: 0.0
@@ -23,7 +23,7 @@ impl Game {
     }
 
     fn get_field_size(&self, window: &PistonWindow) -> [u32; 2] {
-        [2*window.size().width/3, window.size().height]
+        [window.size().width, window.size().height]
     }
 
     fn draw_field(&mut self, window: &PistonWindow) {

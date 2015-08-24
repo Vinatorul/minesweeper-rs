@@ -63,18 +63,24 @@ impl Field {
             i += 1;
             match self.get_content_safe(i) {
                 Some(&Content::None) => {
-                    // don`t care about row
-                    let mut ct = self.is_bomb_safe(i-w) +
-                                 self.is_bomb_safe(i+w);
+                    let ct_bomb = |b| {
+                        match b {
+                            true => 1,
+                            false => 0
+                        }
+                    };
+                     // don`t care about row
+                    let mut ct = ct_bomb(self.is_bomb_safe(i-w)) +
+                                 ct_bomb(self.is_bomb_safe(i+w));
                     if i % w > 0 { // check left side position
-                        ct += self.is_bomb_safe(i-w-1) +
-                              self.is_bomb_safe(i-1) +
-                              self.is_bomb_safe(i+w-1);
+                        ct += ct_bomb(self.is_bomb_safe(i-w-1)) +
+                              ct_bomb(self.is_bomb_safe(i-1)) +
+                              ct_bomb(self.is_bomb_safe(i+w-1));
                     }
                     if i % w < w - 1 { // check right side position
-                        ct += self.is_bomb_safe(i-w+1) +
-                              self.is_bomb_safe(i+1) +
-                              self.is_bomb_safe(i+w+1);
+                        ct += ct_bomb(self.is_bomb_safe(i-w+1)) +
+                              ct_bomb(self.is_bomb_safe(i+1)) +
+                              ct_bomb(self.is_bomb_safe(i+w+1));
                     }
                     if ct > 0 {
                         self.get_cell_mut(i as u32).content = Content::Number(ct);
@@ -123,10 +129,10 @@ impl Field {
         &self.get_cell(i).content
     }
 
-    fn is_bomb_safe(&self, i: i32) -> u8 {
+    fn is_bomb_safe(&self, i: i32) -> bool {
         match self.get_content_safe(i) {
-            Some(&Content::Bomb) => 1,
-            _ => 0
+            Some(&Content::Bomb) => true,
+            _ => false
         }
     }
 
@@ -149,11 +155,38 @@ impl Field {
     }
 
     pub fn chain_reveal(&mut self, u: u32) {
-        // let deq = VecDeque<i32>::new();
-        // deq.push_back(u);
-        // while !deq.is_empty() {
-        //     let i = deq.pop_front().unwrap();
-        //     
-        // }
+        let mut deq = VecDeque::new();
+        deq.push_back(u as i32);
+        let w = self.width as i32;
+        while !deq.is_empty() {
+            let i = deq.pop_front().unwrap();
+            let mut check = |x| {
+                match self.get_content_safe(x) {
+                    Some(&Content::None) => {
+                        if !self.revealed(x as u32) {
+                            deq.push_back(x);
+                        }
+                        self.reveal(x as u32);
+                    },
+                    Some(&Content::Number(_n)) => {
+                        self.reveal(x as u32);
+                    },
+                    _ => {}
+                }
+            };
+            // don`t care about row
+            check(i-w);
+            check(i+w);
+            if i % w > 0 { // check left side position
+                check(i-w-1);
+                check(i-1);
+                check(i+w-1);
+            }
+            if i % w < w - 1 { // check right side position
+                check(i-w+1);
+                check(i+1);
+                check(i+w+1);
+            }
+        }
     }
 }
