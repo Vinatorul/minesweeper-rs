@@ -1,5 +1,6 @@
 use rand;
 use rand::Rng;
+use std::collections::VecDeque;
 
 pub enum Content {
     Number(u8),
@@ -28,7 +29,8 @@ pub struct Field {
     cells: Vec<Cell>,
     width: u32,
     height: u32,
-    mines: u32
+    mines: u32,
+    size: u32
 }
 
 impl Field {
@@ -37,9 +39,10 @@ impl Field {
             width: width,
             height: height,
             cells: vec![],
-            mines: mines
+            mines: mines,
+            size: width*height
         };
-        for i in 0..width*height {
+        for i in 0..field.size {
             field.cells.push(Cell{index: i, 
                            content: Content::None,
                            revealed: false});
@@ -51,53 +54,39 @@ impl Field {
     fn fill(&mut self) {
         self.clear();
         for _i in 0..self.mines {
-            let ind = rand::thread_rng().gen_range(0, self.width*self.height);
+            let ind = rand::thread_rng().gen_range(0, self.size);
             self.get_cell_mut(ind).content = Content::Bomb
         }
-        for i in 0..self.width {
-            for j in 0..self.height {           
-                match self.get_cell(i + j*self.height).content {
-                    Content::None => {
-                        let mut ct : u8 = 0;
-                        let i1 = i as i32;
-                        let j1 = j as i32;
-                        if let Some(b) = self.is_bomb_safe(i1-1, j1-1) { 
-                            ct += b;
-                        }   
-                        if let Some(b) = self.is_bomb_safe(i1-1, j1) {
-                            ct += b;
-                        } 
-                        if let Some(b) = self.is_bomb_safe(i1-1, j1+1) {
-                            ct += b;
-                        } 
-                        if let Some(b) = self.is_bomb_safe(i1, j1-1) {
-                            ct += b;
-                        } 
-                        if let Some(b) = self.is_bomb_safe(i1, j1+1) {
-                            ct += b;
-                        } 
-                        if let Some(b) = self.is_bomb_safe(i1+1, j1-1) {
-                            ct += b;
-                        } 
-                        if let Some(b) = self.is_bomb_safe(i1+1, j1) {
-                            ct += b;
-                        } 
-                        if let Some(b) = self.is_bomb_safe(i1+1, j1+1) {
-                            ct += b;
-                        } 
-                        if ct > 0 {
-                            let h = self.height; // get h before mutually borrowing
-                            self.get_cell_mut(i + j*h).content = Content::Number(ct);
-                        }
-                    },
-                    _ => {}
-                }               
+        let mut i: i32 = -1;
+        let w = self.width as i32;
+        while i < (self.size - 1) as i32 {
+            i += 1;
+            match self.get_content_safe(i) {
+                Some(&Content::None) => {
+                    // don`t care about row
+                    let mut ct = self.is_bomb_safe(i-w) +
+                                 self.is_bomb_safe(i+w);
+                    if i % w > 0 { // check left side position
+                        ct += self.is_bomb_safe(i-w-1) +
+                              self.is_bomb_safe(i-1) +
+                              self.is_bomb_safe(i+w-1);
+                    }
+                    if i % w < w - 1 { // check right side position
+                        ct += self.is_bomb_safe(i-w+1) +
+                              self.is_bomb_safe(i+1) +
+                              self.is_bomb_safe(i+w+1);
+                    }
+                    if ct > 0 {
+                        self.get_cell_mut(i as u32).content = Content::Number(ct);
+                    }
+                },
+                _ => {}
             }
         }
     }
 
     fn clear(&mut self) {
-        for i in 0..self.width*self.height {
+        for i in 0..self.size {
             self.get_cell_mut(i).clear();
         }
     }
@@ -122,20 +111,22 @@ impl Field {
             .unwrap_or_else(|| panic!("Range check error at Field::get_cell ({})", i))
     }
 
+    fn get_content_safe(&self, i:i32) -> Option<&Content> {
+        if (i < 0) || ((i as u32) >= self.size) {
+            None
+        } else {
+            Some(self.get_content(i as u32))
+        }
+    }
+
     pub fn get_content(& self, i: u32) -> &Content {
         &self.get_cell(i).content
     }
 
-    fn is_bomb_safe(&self, i: i32, j: i32) -> Option<u8> {
-        if (i < 0) || ((i as u32) >= self.width) {
-            None
-        } else if (j < 0) || ((j as u32) >= self.height) {
-            None
-        } else {
-            match self.get_cell((i as u32)+ (j as u32)*self.height).content {
-                Content::Bomb => Some(1),
-                _  => Some(0)
-            }
+    fn is_bomb_safe(&self, i: i32) -> u8 {
+        match self.get_content_safe(i) {
+            Some(&Content::Bomb) => 1,
+            _ => 0
         }
     }
 
@@ -152,8 +143,17 @@ impl Field {
     } 
 
     pub fn reveal_all(&mut self) {
-      for i in 0..self.width*self.height {
+      for i in 0..self.size {
             self.get_cell_mut(i).revealed = true;
         }  
+    }
+
+    pub fn chain_reveal(&mut self, u: u32) {
+        // let deq = VecDeque<i32>::new();
+        // deq.push_back(u);
+        // while !deq.is_empty() {
+        //     let i = deq.pop_front().unwrap();
+        //     
+        // }
     }
 }

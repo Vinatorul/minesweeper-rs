@@ -18,7 +18,7 @@ fn main() {
         .arg(Arg::from_usage("--height [height] 'window height'"))
         .get_matches();
 
-    let mut width = 600;
+    let mut width = 900;
     let mut height = 600;
     if let Some(w) = matches.value_of("width") {
         width = w.parse().unwrap_or(width);

@@ -11,7 +11,7 @@ pub struct Game {
 impl Game {
     pub fn new(glyphs: Glyphs) -> Game {
         Game {
-            field: Field::new(20, 20, 50),
+            field: Field::new(20, 25, 50),
             glyphs: glyphs,
             mouse_x: 0.0,
             mouse_y: 0.0
@@ -22,19 +22,22 @@ impl Game {
         self.draw_field(window);      
     }
 
+    fn get_field_size(&self, window: &PistonWindow) -> [u32; 2] {
+        [2*window.size().width/3, window.size().height]
+    }
+
     fn draw_field(&mut self, window: &PistonWindow) {
-        let w = window.size().width as f64;
-        let h = window.size().height as f64;
-        let cell_h = h / (self.field.get_height() as f64);
-        let cell_w = w / (self.field.get_width() as f64);
+        let field_size = self.get_field_size(window);
+        let cell_w = (field_size[0] / self.field.get_width()) as f64;
+        let cell_h = (field_size[1] / self.field.get_height()) as f64;
         window.draw_2d(|c, g| {
             clear([0.0, 0.0, 0.0, 1.0], g);
             for i in 0..self.field.get_width() {
                 for j in 0..self.field.get_height() {
-                    if !self.field.revealed(i + j*self.field.get_height()) {
+                    if !self.field.revealed(i + j*self.field.get_width()) {
                         continue;
                     }
-                    match *self.field.get_content(i + j*self.field.get_height()) {
+                    match *self.field.get_content(i + j*self.field.get_width()) {
                         Content::Bomb => {
                             rectangle([1.0, 0.0, 0.0, 1.0],
                                       [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
@@ -72,14 +75,13 @@ impl Game {
             Button::Mouse(btn) => {
                 match btn {
                     MouseButton::Left => {
-                        let w = window.size().width;
-                        let h = window.size().height;
-                        let cell_h = h / self.field.get_height();
-                        let cell_w = w / self.field.get_width();
+                        let field_size = self.get_field_size(window);
+                        let cell_w = field_size[0] / self.field.get_width();
+                        let cell_h = field_size[1] / self.field.get_height();
                         let x = (self.mouse_x.floor() as u32)/cell_w; 
                         let y = (self.mouse_y.floor() as u32)/cell_h;
-                        let h = self.field.get_height();
-                        self.open_cell(x + y*h);
+                        let w = self.field.get_width();
+                        self.open_cell(x + y*w);
                     },
                     _ => println!("{:?}", btn)
                 }
@@ -93,6 +95,9 @@ impl Game {
                 self.field.reveal_all();
                 println!("Game over =(, {}", i);
             },
+            Content::None => {
+               self.field.chain_reveal(i);
+            }
             _ => println!("ok {}", i)
         }
     }
