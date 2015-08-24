@@ -1,6 +1,13 @@
 # minesweeper-rs  [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs) [![license](http://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 Simple minesweeper in Rust
 
+## How to Play
+
+There are 50 bombs for the 20x20 field.
+Contols:
+* `R` - restart
+* `LMB` click - open a cell
+
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
 
