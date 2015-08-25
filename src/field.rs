@@ -155,37 +155,40 @@ impl Field {
     }
 
     pub fn chain_reveal(&mut self, u: u32) {
-        let mut deq = VecDeque::new();
-        deq.push_back(u as i32);
         let w = self.width as i32;
+        // clojure to check for blank cells
+        let mut check = |x, d: &mut VecDeque<i32>| {
+            match self.get_content_safe(x) {
+                Some(&Content::None) => {
+                    if !self.revealed(x as u32) {
+                        d.push_back(x);
+                    }
+                    self.reveal(x as u32);
+                },
+                Some(&Content::Number(_n)) => {
+                    self.reveal(x as u32);
+                },
+                _ => {}
+            }
+        };
+        // BFS initialize
+        let deq = &mut VecDeque::new();
+        deq.push_back(u as i32);
+        // BFS
         while !deq.is_empty() {
             let i = deq.pop_front().unwrap();
-            let mut check = |x| {
-                match self.get_content_safe(x) {
-                    Some(&Content::None) => {
-                        if !self.revealed(x as u32) {
-                            deq.push_back(x);
-                        }
-                        self.reveal(x as u32);
-                    },
-                    Some(&Content::Number(_n)) => {
-                        self.reveal(x as u32);
-                    },
-                    _ => {}
-                }
-            };
             // don`t care about row
-            check(i-w);
-            check(i+w);
+            check(i-w, deq);
+            check(i+w, deq);
             if i % w > 0 { // check left side position
-                check(i-w-1);
-                check(i-1);
-                check(i+w-1);
+                check(i-w-1, deq);
+                check(i-1, deq);
+                check(i+w-1, deq);
             }
             if i % w < w - 1 { // check right side position
-                check(i-w+1);
-                check(i+1);
-                check(i+w+1);
+                check(i-w+1, deq);
+                check(i+1, deq);
+                check(i+w+1, deq);
             }
         }
     }
