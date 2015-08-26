@@ -1,0 +1,9 @@
+[clog]
+repository = "https://github.com/Vinatorul/minesweeper-rs"
+outfile = "CHANGELOG.md"
+from-latest-tag = true
+
+[sections]
+Performance = ["perf"]
+Improvements = ["imp"]
+Graphics = ["gr"]
