@@ -62,3 +62,7 @@ Contributions are always welcome! Please use the following guidelines when contr
 6. `git rebase` into concise commits and remove `--fixup`s (`git rebase -i HEAD~NUM` where `NUM` is number of commits back)
 7. Push your changes back to your fork (`git push origin $your-branch`)
 8. Create a pull request! (You can also create the pull request first, and we'll merge when ready. This a good way to discuss proposed changes.)
+
+## Dependencies Tree
+
+![minesweeper dependencies](minesweeper.png)
