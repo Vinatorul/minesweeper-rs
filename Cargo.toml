@@ -3,9 +3,14 @@ name = "minesweeper"
 version = "0.1.0"
 authors = ["Alexander Kuvaev <alexander@kuvaev.me>"]
 license-file = "LICENSE"
+description = "Simple minesweeper in Rust"
+repository = "https://github.com/Vinatorul/minesweeper-rs.git"
+readme = "README.md"
+license = "MIT"
+keywords = ["minesweeper", "game"]
 
 [dependencies]
-piston_window = "0.15.0"
-clap = "1.2"
-rand = "*"
-find_folder = "*"
+piston_window = "~0.15.0"
+clap = "^1.2"
+rand = "^0.3"
+find_folder = "^0.2"
