@@ -52,13 +52,13 @@ Contributions are always welcome! Please use the following guidelines when contr
     - `feat` - A new feature
     - `imp` - An improvement to an existing feature
     - `perf` - A performance improvement
-    - `docs` - Changes to documentation only
     - `tests` - Changes to the testing framework or tests only
     - `fix` - A bug fix
     - `refactor` - Code functionality doesn't change, but underlying structure may
     - `style` - Stylistic changes only, no functionality changes
     - `wip` - A work in progress commit (Should typically be `git rebase`'ed away)
     - `chore` - Catch all or things that have to do with the build system, etc
+    - `gr` - Graphics changes
  * The `COMPONENT` is optional, and may be a single file, directory, or logical component. Can be omitted if commit applies globally
 5. Run the tests (`cargo test`)
 6. `git rebase` into concise commits and remove `--fixup`s (`git rebase -i HEAD~NUM` where `NUM` is number of commits back)
