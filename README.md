@@ -1,6 +1,6 @@
-# minesweeper-rs  [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs) [![license](http://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+# minesweeper-rs  [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs) [![license](http://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE) [![Join the chat at https://gitter.im/Vinatorul/minesweeper-rs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Vinatorul/minesweeper-rs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Join the chat at https://gitter.im/Vinatorul/minesweeper-rs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Vinatorul/minesweeper-rs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Simple minesweeper in Rust
 
 ## How to Play
