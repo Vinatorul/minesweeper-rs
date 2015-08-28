@@ -22,7 +22,7 @@ impl Game {
         window.draw_2d(|c, g| {
             clear([0.0, 0.0, 0.0, 1.0], g);
             let field_rect = self.get_field_rect(window);
-            self.draw_field(c, g, field_rect);
+            self.field.draw(c, g, field_rect, &mut self.glyphs);
         });
     }
 
@@ -34,75 +34,6 @@ impl Game {
         [0, 0, w, h]
     }
 
-    fn draw_field(&mut self, context: Context, graphics: &mut G2d, field_rect: [u32; 4]) {
-        let cell_w = field_rect[2] / self.field.get_width();
-        let cell_h = field_rect[3] / self.field.get_height();
-        for i in 0..self.field.get_width() {
-            for j in 0..self.field.get_height() {
-                if !self.field.revealed(i + j*self.field.get_width()) {
-                    continue;
-                }
-                match *self.field.get_content(i + j*self.field.get_width()) {
-                    Content::Bomb => {
-                        rectangle([1.0, 0.0, 0.0, 1.0],
-                                  [
-                                    (field_rect[0] + i*cell_w) as f64,
-                                    (field_rect[1] + j*cell_h) as f64,
-                                    cell_w as f64,
-                                    cell_h as f64
-                                  ],
-                                  context.transform,
-                                  graphics);
-
-                    },
-                    Content::Number(n) => {
-                        let transform = context.transform.trans(10.0 + (field_rect[0] + i*cell_w) as f64,
-                                                                (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
-                        text::Text::colored([1.0, 1.0, 1.0, 1.0], 32).draw(
-                            &*n.to_string(),
-                            &mut self.glyphs,
-                            &context.draw_state,
-                            transform,
-                            graphics
-                        );
-                    },
-                    Content::None => {
-                        rectangle([1.0, 1.0, 1.0, 1.0],
-                                  [
-                                    (field_rect[0] + i*cell_w) as f64,
-                                    (field_rect[1] + j*cell_h) as f64,
-                                    cell_w as f64,
-                                    cell_h as f64
-                                  ],
-                                  context.transform,
-                                  graphics);
-                    }
-                }
-            }
-        }
-        for i in 0..self.field.get_width()+1 {
-            line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                .draw([
-                        (field_rect[0] + i*cell_w) as f64,
-                        field_rect[1] as f64,
-                        (field_rect[0] + i*cell_w) as f64,
-                        (field_rect[1] + field_rect[3]) as f64
-                      ],
-                      &context.draw_state,
-                      context.transform,
-                      graphics);
-            line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                .draw([
-                        field_rect[0] as f64,
-                        (field_rect[1] + i*cell_h) as f64,
-                        (field_rect[0] + field_rect[2]) as f64,
-                        (field_rect[1] + i*cell_h) as f64
-                      ],
-                      &context.draw_state,
-                      context.transform,
-                      graphics);
-        }
-    }
 
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
         match button {
