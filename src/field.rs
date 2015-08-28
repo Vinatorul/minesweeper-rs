@@ -221,9 +221,9 @@ impl Field {
 
                     },
                     Content::Number(n) => {
-                        let transform = context.transform.trans(10.0 + (field_rect[0] + i*cell_w) as f64,
+                        let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
                                                                 (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
-                        text::Text::colored([1.0, 1.0, 1.0, 1.0], 32).draw(
+                        text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h).draw(
                             &*n.to_string(),
                             glyps,
                             &context.draw_state,
