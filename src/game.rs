@@ -22,14 +22,14 @@ impl Game {
         self.draw_field(window);      
     }
 
-    fn get_field_size(&self, window: &PistonWindow) -> [u32; 2] {
-        [window.size().width, window.size().height]
+    fn get_max_field_size(&self, window: &PistonWindow) -> [u32; 2] {
+        [2*window.size().width/3, window.size().height]
     }
 
     fn draw_field(&mut self, window: &PistonWindow) {
-        let field_size = self.get_field_size(window);
-        let cell_w = (field_size[0] / self.field.get_width()) as f64;
-        let cell_h = (field_size[1] / self.field.get_height()) as f64;
+        let max_field_size = self.get_max_field_size(window);
+        let cell_w = (max_field_size[0] / self.field.get_width()) as f64;
+        let cell_h = (max_field_size[1] / self.field.get_height()) as f64;
         window.draw_2d(|c, g| {
             clear([0.0, 0.0, 0.0, 1.0], g);
             for i in 0..self.field.get_width() {
@@ -61,6 +61,17 @@ impl Game {
                     }
                 }
             }
+            let field_size = [cell_w*(self.field.get_width() as f64), cell_h*(self.field.get_height() as f64)];
+            for i in 0..self.field.get_width()+1 {
+                line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
+                    .draw([(i as f64)*cell_w, 0.0, (i as f64)*cell_w, field_size[1]],
+                          &c.draw_state,
+                          c.transform, g);
+                line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
+                    .draw([0.0, (i as f64)*cell_h, field_size[0], (i as f64)*cell_h],
+                          &c.draw_state,
+                          c.transform, g);
+            }
         }); 
     }
 
@@ -75,9 +86,13 @@ impl Game {
             Button::Mouse(btn) => {
                 match btn {
                     MouseButton::Left => {
-                        let field_size = self.get_field_size(window);
-                        let cell_w = field_size[0] / self.field.get_width();
-                        let cell_h = field_size[1] / self.field.get_height();
+                        let max_field_size = self.get_max_field_size(window);
+                        let cell_w = max_field_size[0] / self.field.get_width();
+                        let cell_h = max_field_size[1] / self.field.get_height();
+                        if (self.mouse_x > (cell_w*self.field.get_width()) as f64) ||
+                            (self.mouse_y > (cell_h*self.field.get_height())  as f64) {
+                                return;
+                            }
                         let x = (self.mouse_x.floor() as u32)/cell_w; 
                         let y = (self.mouse_y.floor() as u32)/cell_h;
                         let w = self.field.get_width();
