@@ -20,19 +20,23 @@ impl Game {
 
     pub fn render(&mut self, window: &PistonWindow) {      
         window.draw_2d(|c, g| {
-            let max_field_size = self.get_max_field_size(window);
-            self.draw_field(c, g, max_field_size);
+            clear([0.0, 0.0, 0.0, 1.0], g);
+            let field_rect = self.get_field_rect(window);
+            self.draw_field(c, g, field_rect);
         });
     }
 
-    fn get_max_field_size(&self, window: &PistonWindow) -> [u32; 2] {
-        [2*window.size().width/3, window.size().height]
+    fn get_field_rect(&self, window: &PistonWindow) -> [u32; 4] {
+        let mut w = 2*window.size().width/3;
+        w = (w /self.field.get_width()) * self.field.get_width();
+        let mut h = window.size().height;
+        h = (h /self.field.get_height()) * self.field.get_height();
+        [0, 0, w, h]
     }
 
-    fn draw_field(&mut self, context: Context, graphics: &mut G2d, max_field_size: [u32; 2]) {
-        let cell_w = (max_field_size[0] / self.field.get_width()) as f64;
-        let cell_h = (max_field_size[1] / self.field.get_height()) as f64;
-        clear([0.0, 0.0, 0.0, 1.0], graphics);
+    fn draw_field(&mut self, context: Context, graphics: &mut G2d, field_rect: [u32; 4]) {
+        let cell_w = field_rect[2] / self.field.get_width();
+        let cell_h = field_rect[3] / self.field.get_height();
         for i in 0..self.field.get_width() {
             for j in 0..self.field.get_height() {
                 if !self.field.revealed(i + j*self.field.get_width()) {
@@ -41,13 +45,19 @@ impl Game {
                 match *self.field.get_content(i + j*self.field.get_width()) {
                     Content::Bomb => {
                         rectangle([1.0, 0.0, 0.0, 1.0],
-                                  [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
+                                  [
+                                    (field_rect[0] + i*cell_w) as f64,
+                                    (field_rect[1] + j*cell_h) as f64,
+                                    cell_w as f64,
+                                    cell_h as f64
+                                  ],
                                   context.transform,
                                   graphics);
 
                     },
                     Content::Number(n) => {
-                        let transform = context.transform.trans((i as f64)*cell_w + 10.0, (j as f64)*cell_h + cell_h - 5.0);
+                        let transform = context.transform.trans(10.0 + (field_rect[0] + i*cell_w) as f64,
+                                                                (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
                         text::Text::colored([1.0, 1.0, 1.0, 1.0], 32).draw(
                             &*n.to_string(),
                             &mut self.glyphs,
@@ -58,22 +68,36 @@ impl Game {
                     },
                     Content::None => {
                         rectangle([1.0, 1.0, 1.0, 1.0],
-                                  [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
+                                  [
+                                    (field_rect[0] + i*cell_w) as f64,
+                                    (field_rect[1] + j*cell_h) as f64,
+                                    cell_w as f64,
+                                    cell_h as f64
+                                  ],
                                   context.transform,
                                   graphics);
                     }
                 }
             }
         }
-        let field_size = [cell_w*(self.field.get_width() as f64), cell_h*(self.field.get_height() as f64)];
         for i in 0..self.field.get_width()+1 {
             line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                .draw([(i as f64)*cell_w, 0.0, (i as f64)*cell_w, field_size[1]],
+                .draw([
+                        (field_rect[0] + i*cell_w) as f64,
+                        field_rect[1] as f64,
+                        (field_rect[0] + i*cell_w) as f64,
+                        (field_rect[1] + field_rect[3]) as f64
+                      ],
                       &context.draw_state,
                       context.transform,
                       graphics);
             line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                .draw([0.0, (i as f64)*cell_h, field_size[0], (i as f64)*cell_h],
+                .draw([
+                        field_rect[0] as f64,
+                        (field_rect[1] + i*cell_h) as f64,
+                        (field_rect[0] + field_rect[2]) as f64,
+                        (field_rect[1] + i*cell_h) as f64
+                      ],
                       &context.draw_state,
                       context.transform,
                       graphics);
@@ -91,15 +115,17 @@ impl Game {
             Button::Mouse(btn) => {
                 match btn {
                     MouseButton::Left => {
-                        let max_field_size = self.get_max_field_size(window);
-                        let cell_w = max_field_size[0] / self.field.get_width();
-                        let cell_h = max_field_size[1] / self.field.get_height();
-                        if (self.mouse_x > (cell_w*self.field.get_width()) as f64) ||
-                            (self.mouse_y > (cell_h*self.field.get_height())  as f64) {
-                                return;
-                            }
-                        let x = (self.mouse_x.floor() as u32)/cell_w; 
-                        let y = (self.mouse_y.floor() as u32)/cell_h;
+                        let field_rect = self.get_field_rect(window);
+                        let cell_w = field_rect[2] / self.field.get_width();
+                        let cell_h = field_rect[3] / self.field.get_height();
+                        let mouse_x = self.mouse_x.floor() as u32;
+                        let mouse_y = self.mouse_y.floor() as u32;
+                        if (mouse_x < field_rect[0]) || (mouse_x > field_rect[0] + field_rect[2]) ||
+                           (mouse_y < field_rect[1]) || (mouse_y > field_rect[1] + field_rect[3]) {
+                            return;
+                        }
+                        let x = (mouse_x - field_rect[0]) / cell_w;
+                        let y = (mouse_y - field_rect[1]) / cell_h;
                         let w = self.field.get_width();
                         self.open_cell(x + y*w);
                     },
