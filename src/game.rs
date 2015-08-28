@@ -19,60 +19,65 @@ impl Game {
     }
 
     pub fn render(&mut self, window: &PistonWindow) {      
-        self.draw_field(window);      
+        window.draw_2d(|c, g| {
+            let max_field_size = self.get_max_field_size(window);
+            self.draw_field(c, g, max_field_size);
+        });
     }
 
     fn get_max_field_size(&self, window: &PistonWindow) -> [u32; 2] {
         [2*window.size().width/3, window.size().height]
     }
 
-    fn draw_field(&mut self, window: &PistonWindow) {
-        let max_field_size = self.get_max_field_size(window);
+    fn draw_field(&mut self, context: Context, graphics: &mut G2d, max_field_size: [u32; 2]) {
         let cell_w = (max_field_size[0] / self.field.get_width()) as f64;
         let cell_h = (max_field_size[1] / self.field.get_height()) as f64;
-        window.draw_2d(|c, g| {
-            clear([0.0, 0.0, 0.0, 1.0], g);
-            for i in 0..self.field.get_width() {
-                for j in 0..self.field.get_height() {
-                    if !self.field.revealed(i + j*self.field.get_width()) {
-                        continue;
-                    }
-                    match *self.field.get_content(i + j*self.field.get_width()) {
-                        Content::Bomb => {
-                            rectangle([1.0, 0.0, 0.0, 1.0],
-                                      [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
-                                      c.transform, g);
+        clear([0.0, 0.0, 0.0, 1.0], graphics);
+        for i in 0..self.field.get_width() {
+            for j in 0..self.field.get_height() {
+                if !self.field.revealed(i + j*self.field.get_width()) {
+                    continue;
+                }
+                match *self.field.get_content(i + j*self.field.get_width()) {
+                    Content::Bomb => {
+                        rectangle([1.0, 0.0, 0.0, 1.0],
+                                  [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
+                                  context.transform,
+                                  graphics);
 
-                        },
-                        Content::Number(n) => {
-                            let transform = c.transform.trans((i as f64)*cell_w + 10.0, (j as f64)*cell_h + cell_h - 5.0);
-                            text::Text::colored([1.0, 1.0, 1.0, 1.0], 32).draw(
-                                &*n.to_string(),
-                                &mut self.glyphs,
-                                &c.draw_state,
-                                transform, g
-                            );
-                        },
-                        Content::None => {
-                            rectangle([1.0, 1.0, 1.0, 1.0],
-                                      [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
-                                      c.transform, g);
-                        }
+                    },
+                    Content::Number(n) => {
+                        let transform = context.transform.trans((i as f64)*cell_w + 10.0, (j as f64)*cell_h + cell_h - 5.0);
+                        text::Text::colored([1.0, 1.0, 1.0, 1.0], 32).draw(
+                            &*n.to_string(),
+                            &mut self.glyphs,
+                            &context.draw_state,
+                            transform,
+                            graphics
+                        );
+                    },
+                    Content::None => {
+                        rectangle([1.0, 1.0, 1.0, 1.0],
+                                  [(i as f64)*cell_w, (j as f64)*cell_h, cell_w, cell_h],
+                                  context.transform,
+                                  graphics);
                     }
                 }
             }
-            let field_size = [cell_w*(self.field.get_width() as f64), cell_h*(self.field.get_height() as f64)];
-            for i in 0..self.field.get_width()+1 {
-                line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                    .draw([(i as f64)*cell_w, 0.0, (i as f64)*cell_w, field_size[1]],
-                          &c.draw_state,
-                          c.transform, g);
-                line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                    .draw([0.0, (i as f64)*cell_h, field_size[0], (i as f64)*cell_h],
-                          &c.draw_state,
-                          c.transform, g);
-            }
-        }); 
+        }
+        let field_size = [cell_w*(self.field.get_width() as f64), cell_h*(self.field.get_height() as f64)];
+        for i in 0..self.field.get_width()+1 {
+            line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
+                .draw([(i as f64)*cell_w, 0.0, (i as f64)*cell_w, field_size[1]],
+                      &context.draw_state,
+                      context.transform,
+                      graphics);
+            line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
+                .draw([0.0, (i as f64)*cell_h, field_size[0], (i as f64)*cell_h],
+                      &context.draw_state,
+                      context.transform,
+                      graphics);
+        }
     }
 
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
