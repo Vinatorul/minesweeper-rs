@@ -1,4 +1,4 @@
-use field::{Field, Content};
+use field::{Field, Content, MoveDestination};
 use piston_window::*;
 
 pub struct Game {
@@ -40,6 +40,10 @@ impl Game {
             Button::Keyboard(key) => {
                 match key {
                     Key::R => self.field.restart(),
+                    Key::Up => self.field.move_selection(MoveDestination::Up),
+                    Key::Down => self.field.move_selection(MoveDestination::Down),
+                    Key::Left => self.field.move_selection(MoveDestination::Left),
+                    Key::Right => self.field.move_selection(MoveDestination::Right),
                     _ => println!("{:?}", key)
                 }
             },

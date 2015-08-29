@@ -9,8 +9,14 @@ pub enum Content {
     None
 }
 
+pub enum MoveDestination {
+    Up,
+    Down,
+    Left,
+    Right
+}
+
 struct Cell {
-    index: u32,
     content: Content,
     revealed: bool
 }
@@ -31,7 +37,9 @@ pub struct Field {
     width: u32,
     height: u32,
     mines: u32,
-    size: u32
+    size: u32,
+    selected_x: u32,
+    selected_y: u32
 }
 
 impl Field {
@@ -41,12 +49,13 @@ impl Field {
             height: height,
             cells: vec![],
             mines: mines,
-            size: width*height
+            size: width*height,
+            selected_x: width/2,
+            selected_y: height/2
         };
-        for i in 0..field.size {
-            field.cells.push(Cell{index: i, 
-                           content: Content::None,
-                           revealed: false});
+        for _i in 0..field.size {
+            field.cells.push(Cell{content: Content::None,
+                                  revealed: false});
         }
         field.fill();
         field
@@ -245,6 +254,15 @@ impl Field {
                 }
             }
         }
+        rectangle([1.0, 1.0, 1.0, 0.5],
+                  [
+                    (field_rect[0] + self.selected_x*cell_w) as f64,
+                    (field_rect[1] + self.selected_y*cell_h) as f64,
+                    cell_w as f64,
+                    cell_h as f64
+                  ],
+                  context.transform,
+                  graphics);
         for i in 0..self.get_width()+1 {
             line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
                 .draw([
@@ -266,6 +284,31 @@ impl Field {
                       &context.draw_state,
                       context.transform,
                       graphics);
+        }
+    }
+
+    pub fn move_selection(&mut self, dest: MoveDestination) {
+        match dest {
+            MoveDestination::Up => {
+                if self.selected_y > 0 {
+                    self.selected_y -= 1;
+                }
+            },
+            MoveDestination::Down => {
+                if self.selected_y < self.height - 1 {
+                    self.selected_y += 1;
+                }
+            },
+            MoveDestination::Left => {
+                if self.selected_x > 0 {
+                    self.selected_x -= 1;
+                }
+            },
+            MoveDestination::Right => {
+                if self.selected_x < self.width - 1 {
+                    self.selected_x += 1;
+                }
+            }
         }
     }
 }
