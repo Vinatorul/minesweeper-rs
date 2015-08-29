@@ -12,18 +12,24 @@ pub enum Content {
 
 struct Cell {
     content: Content,
-    revealed: bool
+    revealed: bool,
+    marked: bool
 }
 
 impl Cell {
     pub fn clear(&mut self) {
         self.content = Content::None;
         self.revealed = false;
+        self.marked = false;
     }   
 
     fn reveal(&mut self) -> &Content {
         self.revealed = true;
         &self.content
+    }
+
+    fn toggle_mark(&mut self) {
+        self.marked = !self.marked;
     }
 }
 
@@ -62,7 +68,8 @@ impl Field {
         self.size = self.width*self.height;
         for _i in 0..self.size {
             self.cells.push(Cell{content: Content::None,
-                                  revealed: false});
+                                 revealed: false,
+                                 marked: false});
         }
         self.selected_x = self.width/2;
         self.selected_y = self.height/2;
@@ -118,7 +125,7 @@ impl Field {
     }
 
     pub fn reveal(&mut self, i: u32) -> &Content {
-        if !self.revealed(i) {
+        if !(self.revealed(i) || self.marked(i)) {
             if let &Content::Number(_i) = self.get_cell_mut(i).reveal() {
                 self.nubmers_opened += 1;
             }
@@ -128,6 +135,10 @@ impl Field {
 
     pub fn revealed(&self, i: u32) -> bool {
         self.get_cell(i).revealed
+    }
+
+    pub fn marked(&self, i: u32) -> bool {
+        self.get_cell(i).marked
     }
 
     fn get_cell_mut(&mut self, i:u32) -> &mut Cell {
@@ -178,6 +189,9 @@ impl Field {
     }
 
     pub fn chain_reveal(&mut self, u: u32) {
+        if self.marked(u) {
+            return;
+        }
         let w = self.width as i32;
         // clojure to check for blank cells
         let mut check = |x, d: &mut VecDeque<i32>| {
@@ -185,11 +199,17 @@ impl Field {
                 Some(&Content::None) => {
                     if !self.revealed(x as u32) {
                         d.push_back(x);
+                        let item = self.get_cell_mut(x as u32);
+                        item.revealed = true;
+                        item.marked = false;
                     }
-                    self.reveal(x as u32);
                 },
                 Some(&Content::Number(_n)) => {
-                    self.reveal(x as u32);
+                    if !(self.revealed(x as u32)) {
+                        let item = self.get_cell_mut(x as u32);
+                        item.revealed = true;
+                        item.marked = false;
+                    }
                 },
                 _ => {}
             }
@@ -226,43 +246,54 @@ impl Field {
         let cell_h = field_rect[3] / self.get_height();
         for i in 0..self.get_width() {
             for j in 0..self.get_height() {
-                if !self.revealed(i + j*self.get_width()) {
-                    continue;
-                }
-                match *self.get_content(i + j*self.get_width()) {
-                    Content::Mine => {
-                        rectangle([1.0, 0.0, 0.0, 1.0],
-                                  [
-                                    (field_rect[0] + i*cell_w) as f64,
-                                    (field_rect[1] + j*cell_h) as f64,
-                                    cell_w as f64,
-                                    cell_h as f64
-                                  ],
-                                  context.transform,
-                                  graphics);
-                    },
-                    Content::Number(n) => {
-                        let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
-                                                                (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
-                        text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h).draw(
-                            &*n.to_string(),
-                            glyps,
-                            &context.draw_state,
-                            transform,
-                            graphics
-                        );
-                    },
-                    Content::None => {
-                        rectangle([1.0, 1.0, 1.0, 1.0],
-                                  [
-                                    (field_rect[0] + i*cell_w) as f64,
-                                    (field_rect[1] + j*cell_h) as f64,
-                                    cell_w as f64,
-                                    cell_h as f64
-                                  ],
-                                  context.transform,
-                                  graphics);
+                let ind = i + j*self.get_width();
+                if self.revealed(ind) {
+                    match *self.get_content(i + j*self.get_width()) {
+                        Content::Mine => {
+                            rectangle([1.0, 0.0, 0.0, 1.0],
+                                      [
+                                        (field_rect[0] + i*cell_w) as f64,
+                                        (field_rect[1] + j*cell_h) as f64,
+                                        cell_w as f64,
+                                        cell_h as f64
+                                      ],
+                                      context.transform,
+                                      graphics);
+                        },
+                        Content::Number(n) => {
+                            let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
+                                                                    (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
+                            text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h).draw(
+                                &*n.to_string(),
+                                glyps,
+                                &context.draw_state,
+                                transform,
+                                graphics
+                            );
+                        },
+                        Content::None => {
+                            rectangle([1.0, 1.0, 1.0, 1.0],
+                                      [
+                                        (field_rect[0] + i*cell_w) as f64,
+                                        (field_rect[1] + j*cell_h) as f64,
+                                        cell_w as f64,
+                                        cell_h as f64
+                                      ],
+                                      context.transform,
+                                      graphics);
+                        }
                     }
+                }
+                if self.marked(ind) {
+                    rectangle([0.0, 1.0, 0.0, 0.75],
+                              [
+                                (field_rect[0] + i*cell_w) as f64,
+                                (field_rect[1] + j*cell_h) as f64,
+                                cell_w as f64,
+                                cell_h as f64
+                              ],
+                              context.transform,
+                              graphics);
                 }
             }
         }
@@ -360,6 +391,12 @@ impl Field {
         }
         if restart_neded {
             self.restart();
+        }
+    }
+
+    pub fn mark(&mut self, i: u32) {
+        if !self.revealed(i) {
+            self.get_cell_mut(i).toggle_mark();
         }
     }
 }

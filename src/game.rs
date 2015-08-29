@@ -108,6 +108,10 @@ impl<'a> Game<'a> {
                             let ind = self.field.get_selected_ind();
                             self.open_cell(ind);
                         },
+                        Key::LCtrl | Key::RCtrl => {
+                            let ind = self.field.get_selected_ind();
+                            self.field.mark(ind);
+                        }
                         Key::H => {
                             self.ui.proc_key(ParamType::Height);
                             self.in_ui = true;
@@ -124,21 +128,24 @@ impl<'a> Game<'a> {
                     }
                 },
                 Button::Mouse(btn) => {
+                    let field_rect = self.get_field_rect(window);
+                    let cell_w = field_rect[2] / self.field.get_width();
+                    let cell_h = field_rect[3] / self.field.get_height();
+                    let mouse_x = self.mouse_x.floor() as u32;
+                    let mouse_y = self.mouse_y.floor() as u32;
+                    if (mouse_x < field_rect[0]) || (mouse_x > field_rect[0] + field_rect[2]) ||
+                       (mouse_y < field_rect[1]) || (mouse_y > field_rect[1] + field_rect[3]) {
+                        return;
+                    }
+                    let x = (mouse_x - field_rect[0]) / cell_w;
+                    let y = (mouse_y - field_rect[1]) / cell_h;
+                    let w = self.field.get_width();
                     match btn {
                         MouseButton::Left => {
-                            let field_rect = self.get_field_rect(window);
-                            let cell_w = field_rect[2] / self.field.get_width();
-                            let cell_h = field_rect[3] / self.field.get_height();
-                            let mouse_x = self.mouse_x.floor() as u32;
-                            let mouse_y = self.mouse_y.floor() as u32;
-                            if (mouse_x < field_rect[0]) || (mouse_x > field_rect[0] + field_rect[2]) ||
-                               (mouse_y < field_rect[1]) || (mouse_y > field_rect[1] + field_rect[3]) {
-                                return;
-                            }
-                            let x = (mouse_x - field_rect[0]) / cell_w;
-                            let y = (mouse_y - field_rect[1]) / cell_h;
-                            let w = self.field.get_width();
                             self.open_cell(x + y*w);
+                        },
+                        MouseButton::Right => {
+                            self.field.mark(x + y*w);
                         },
                         _ => println!("{:?}", btn)
                     }
