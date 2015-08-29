@@ -1,22 +1,27 @@
 use field::{Field, Content, MoveDestination};
+use ui::UI;
 use piston_window::*;
 
-pub struct Game {
+pub struct Game<'a> {
     field: Field,
+    ui: UI<'a>,
     glyphs: Glyphs,
     mouse_x: f64,
     mouse_y: f64,
-    game_ended: bool
+    game_ended: bool,
+    panel_width: u32
 }
 
-impl Game {
-    pub fn new(glyphs: Glyphs) -> Game {
+impl<'a> Game<'a> {
+    pub fn new(glyphs: Glyphs, width: u32, height: u32, mines: u32) -> Game<'a> {
         Game {
-            field: Field::new(20, 15, 50),
+            field: Field::new(width, height, mines),
+            ui: UI::new(width, height, mines),
             glyphs: glyphs,
             mouse_x: 0.0,
             mouse_y: 0.0,
-            game_ended: false
+            game_ended: false,
+            panel_width: 350
         }
     }
 
@@ -25,15 +30,25 @@ impl Game {
             clear([0.0, 0.0, 0.0, 1.0], g);
             let field_rect = self.get_field_rect(window);
             self.field.draw(c, g, field_rect, &mut self.glyphs);
+            let ui_rect = self.get_ui_rect(window);
+            self.ui.draw(c, g, ui_rect, &mut self.glyphs);
         });
     }
 
     fn get_field_rect(&self, window: &PistonWindow) -> [u32; 4] {
-        let mut w = 2*window.size().width/3;
+        let mut w = window.size().width - self.panel_width;
         w = (w /self.field.get_width()) * self.field.get_width();
         let mut h = window.size().height;
         h = (h /self.field.get_height()) * self.field.get_height();
         [0, 0, w, h]
+    }
+
+    fn get_ui_rect(&self, window: &PistonWindow) -> [u32; 4] {
+        let mut field_w = window.size().width - self.panel_width;
+        field_w = (field_w /self.field.get_width()) * self.field.get_width();
+        let w = window.size().width - field_w;
+        let h = window.size().height;
+        [field_w, 0, w, h]
     }
 
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
@@ -80,7 +95,7 @@ impl Game {
             return;
         }
         match *self.field.reveal(i) {
-            Content::Bomb => {
+            Content::Mine => {
                 self.field.reveal_all();
                 self.game_ended = true;
                 println!("Game over :(");

@@ -5,7 +5,7 @@ use piston_window::*;
 
 pub enum Content {
     Number(u8),
-    Bomb,
+    Mine,
     None
 }
 
@@ -70,7 +70,7 @@ impl Field {
         self.clear();
         for _i in 0..self.mines {
             let ind = rand::thread_rng().gen_range(0, self.size);
-            self.get_cell_mut(ind).content = Content::Bomb
+            self.get_cell_mut(ind).content = Content::Mine
         }
         let mut i: i32 = -1;
         let w = self.width as i32;
@@ -78,24 +78,24 @@ impl Field {
             i += 1;
             match self.get_content_safe(i) {
                 Some(&Content::None) => {
-                    let ct_bomb = |b| {
+                    let ct_mine = |b| {
                         match b {
                             true => 1,
                             false => 0
                         }
                     };
                      // don`t care about row
-                    let mut ct = ct_bomb(self.is_bomb_safe(i-w)) +
-                                 ct_bomb(self.is_bomb_safe(i+w));
+                    let mut ct = ct_mine(self.is_mine_safe(i-w)) +
+                                 ct_mine(self.is_mine_safe(i+w));
                     if i % w > 0 { // check left side position
-                        ct += ct_bomb(self.is_bomb_safe(i-w-1)) +
-                              ct_bomb(self.is_bomb_safe(i-1)) +
-                              ct_bomb(self.is_bomb_safe(i+w-1));
+                        ct += ct_mine(self.is_mine_safe(i-w-1)) +
+                              ct_mine(self.is_mine_safe(i-1)) +
+                              ct_mine(self.is_mine_safe(i+w-1));
                     }
                     if i % w < w - 1 { // check right side position
-                        ct += ct_bomb(self.is_bomb_safe(i-w+1)) +
-                              ct_bomb(self.is_bomb_safe(i+1)) +
-                              ct_bomb(self.is_bomb_safe(i+w+1));
+                        ct += ct_mine(self.is_mine_safe(i-w+1)) +
+                              ct_mine(self.is_mine_safe(i+1)) +
+                              ct_mine(self.is_mine_safe(i+w+1));
                     }
                     if ct > 0 {
                         self.get_cell_mut(i as u32).content = Content::Number(ct);
@@ -150,9 +150,9 @@ impl Field {
         &self.get_cell(i).content
     }
 
-    fn is_bomb_safe(&self, i: i32) -> bool {
+    fn is_mine_safe(&self, i: i32) -> bool {
         match self.get_content_safe(i) {
-            Some(&Content::Bomb) => true,
+            Some(&Content::Mine) => true,
             _ => false
         }
     }
@@ -228,7 +228,7 @@ impl Field {
                     continue;
                 }
                 match *self.get_content(i + j*self.get_width()) {
-                    Content::Bomb => {
+                    Content::Mine => {
                         rectangle([1.0, 0.0, 0.0, 1.0],
                                   [
                                     (field_rect[0] + i*cell_w) as f64,
@@ -238,7 +238,6 @@ impl Field {
                                   ],
                                   context.transform,
                                   graphics);
-
                     },
                     Content::Number(n) => {
                         let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,

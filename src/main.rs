@@ -5,6 +5,7 @@ extern crate find_folder;
 
 mod game;
 mod field;
+mod ui;
 
 use piston_window::*;
 use clap::{Arg, App};
@@ -39,7 +40,7 @@ fn main() {
     let factory = window.factory.borrow().clone();
     let glyphs = Glyphs::new(font, factory).unwrap();
 
-    let mut game = game::Game::new(glyphs);
+    let mut game = game::Game::new(glyphs, 20, 20, 50);
 
     for e in window {
         game.render(&e);
