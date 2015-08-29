@@ -5,27 +5,30 @@ struct Block<'a> {
     name: &'a str, 
     num: u32,
     old_num: u32,
-    char_id: char,
+    hotkey: char,
     selected: bool,
     min_val: u32,
-    max_val: u32
+    max_val: u32,
+    param_type: ParamType
 }
 
 impl<'a> Block<'a> {
     pub fn new(name: &'a str,
                num: u32,
-               char_id: char,
+               hotkey: char,
                min_val: u32,
-               max_val: u32) -> Block<'a>
+               max_val: u32,
+               param_type: ParamType) -> Block<'a>
     {
         Block {
             name: name,
             num: num,
             old_num: num,
-            char_id: char_id,
+            hotkey: hotkey,
             selected: false,
             min_val: min_val,
-            max_val: max_val
+            max_val: max_val,
+            param_type: param_type
         }
     }
 
@@ -68,9 +71,9 @@ impl<'a> Block<'a> {
         let transform = context.transform.trans((rect[0] + margin) as f64,
                                                 (rect[1]) as f64);
         let s = if self.selected {
-            format!("Use arrows, press \"{}\" to apply changes", self.char_id)
+            format!("Use arrows, press \"{}\" to apply changes", self.hotkey)
         } else {
-            format!("Press \"{}\" to change", self.char_id)
+            format!("Press \"{}\" to change", self.hotkey)
         };
         text::Text::colored([1.0, 1.0, 1.0, 1.0], text_height).draw(
                             &*s,
@@ -110,9 +113,9 @@ pub struct UI<'a> {
 impl<'a> UI<'a> {
     pub fn new(height: u32, width: u32, mines: u32) -> UI<'a> {
         UI {
-            blocks: vec![Block::new("Field width", width, 'W', 5, 50),
-                         Block::new("Field height", height, 'H', 5, 50),
-                         Block::new("Mines", mines, 'M', 1, 2500),
+            blocks: vec![Block::new("Field width", width, 'W', 5, 50, ParamType::Width),
+                         Block::new("Field height", height, 'H', 5, 50, ParamType::Height),
+                         Block::new("Mines", mines, 'M', 1, 2500, ParamType::Mines),
             ],
             selected_block: -1
         }
@@ -130,14 +133,9 @@ impl<'a> UI<'a> {
     }
 
     pub fn proc_key(&mut self, block: ParamType) -> Option<u32> {
-        let c = match block {
-            ParamType::Width => 'W',
-            ParamType::Height => 'H',
-            ParamType::Mines => 'M'
-        };
         if self.selected_block >= 0 {
             let selected = self.blocks.get_mut(self.selected_block as usize).unwrap();
-            if selected.char_id == c {
+            if selected.param_type == block {
                 selected.selected = false;
                 selected.apply_changes();
                 self.selected_block = -1;
@@ -146,7 +144,7 @@ impl<'a> UI<'a> {
         }
         for i in 0..self.blocks.len() {
             let item = self.blocks.get_mut(i).unwrap();
-            let b = item.char_id == c;
+            let b = item.param_type == block;
             item.selected = b;
             if b {
                 self.selected_block = i as i32;
