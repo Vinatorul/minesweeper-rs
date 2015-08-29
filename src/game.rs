@@ -1,5 +1,5 @@
 use field::{Field, Content, MoveDestination};
-use ui::UI;
+use ui::{UI, BlockType};
 use piston_window::*;
 
 pub struct Game<'a> {
@@ -64,6 +64,9 @@ impl<'a> Game<'a> {
                         let ind = self.field.get_selected_ind();
                         self.open_cell(ind);
                     },
+                    Key::H => self.ui.select(BlockType::Height),
+                    Key::M => self.ui.select(BlockType::Mines),
+                    Key::W => self.ui.select(BlockType::Width),
                     _ => println!("{:?}", key)
                 }
             },
