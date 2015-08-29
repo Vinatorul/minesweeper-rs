@@ -14,7 +14,12 @@ Controls:
 * `M` - mines quantity setup
 * `Arrows` to choose cell (or change settings in `setup` mode)
 * `Space` to open cell
+* `Ctrl` to mark cell
 * `LMB` click on a cell to open
+* `RMB` click on a cell to mark
+
+*Note:* marked cells disallow opennig them, until mark will be removed.
+
 
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
