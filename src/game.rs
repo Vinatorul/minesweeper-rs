@@ -5,7 +5,8 @@ pub struct Game {
     field: Field,
     glyphs: Glyphs,
     mouse_x: f64,
-    mouse_y: f64
+    mouse_y: f64,
+    game_ended: bool
 }
 
 impl Game {
@@ -14,7 +15,8 @@ impl Game {
             field: Field::new(20, 15, 50),
             glyphs: glyphs,
             mouse_x: 0.0,
-            mouse_y: 0.0
+            mouse_y: 0.0,
+            game_ended: false
         }
     }
 
@@ -34,16 +36,19 @@ impl Game {
         [0, 0, w, h]
     }
 
-
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
         match button {
             Button::Keyboard(key) => {
                 match key {
-                    Key::R => self.field.restart(),
+                    Key::R => self.restart(),
                     Key::Up => self.field.move_selection(MoveDestination::Up),
                     Key::Down => self.field.move_selection(MoveDestination::Down),
                     Key::Left => self.field.move_selection(MoveDestination::Left),
                     Key::Right => self.field.move_selection(MoveDestination::Right),
+                    Key::Space => {
+                        let ind = self.field.get_selected_ind();
+                        self.open_cell(ind);
+                    },
                     _ => println!("{:?}", key)
                 }
             },
@@ -71,20 +76,38 @@ impl Game {
     }
 
     fn open_cell(&mut self, i: u32) {
+        if self.game_ended {
+            return;
+        }
         match *self.field.reveal(i) {
             Content::Bomb => {
                 self.field.reveal_all();
-                println!("Game over =(, {}", i);
+                self.game_ended = true;
+                println!("Game over :(");
             },
             Content::None => {
-               self.field.chain_reveal(i);
+                self.field.chain_reveal(i);
+                if self.field.is_victory() {
+                    println!("You win :)");
+                    self.game_ended = true;
+                }
             }
-            _ => println!("ok {}", i)
+            Content::Number(_i) => {
+                if self.field.is_victory() {
+                    println!("You win :)");
+                    self.game_ended = true;
+                }
+            }
         }
     }
 
     pub fn mouse_move(&mut self, mouse_rel: [f64; 2]) {
         self.mouse_x = mouse_rel[0];
         self.mouse_y = mouse_rel[1];
+    }
+
+    fn restart(&mut self) {
+        self.game_ended = false;
+        self.field.restart();
     }
 }

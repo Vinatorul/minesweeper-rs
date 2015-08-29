@@ -27,8 +27,9 @@ impl Cell {
         self.revealed = false;
     }   
 
-    fn reveal(&mut self) {
+    fn reveal(&mut self) -> &Content {
         self.revealed = true;
+        &self.content
     }
 }
 
@@ -39,7 +40,9 @@ pub struct Field {
     mines: u32,
     size: u32,
     selected_x: u32,
-    selected_y: u32
+    selected_y: u32,
+    nubmers_total: u32,
+    nubmers_opened: u32
 }
 
 impl Field {
@@ -51,7 +54,9 @@ impl Field {
             mines: mines,
             size: width*height,
             selected_x: width/2,
-            selected_y: height/2
+            selected_y: height/2,
+            nubmers_total: 0,
+            nubmers_opened: 0
         };
         for _i in 0..field.size {
             field.cells.push(Cell{content: Content::None,
@@ -94,6 +99,7 @@ impl Field {
                     }
                     if ct > 0 {
                         self.get_cell_mut(i as u32).content = Content::Number(ct);
+                        self.nubmers_total += 1;
                     }
                 },
                 _ => {}
@@ -105,12 +111,17 @@ impl Field {
         for i in 0..self.size {
             self.get_cell_mut(i).clear();
         }
+        self.nubmers_opened = 0;
+        self.nubmers_total = 0;
     }
 
     pub fn reveal(&mut self, i: u32) -> &Content {
-        let cell = self.get_cell_mut(i);
-        cell.reveal();
-        &cell.content
+        if !self.revealed(i) {
+            if let &Content::Number(_i) = self.get_cell_mut(i).reveal() {
+                self.nubmers_opened += 1;
+            }
+        }
+        &self.get_content(i)
     }
 
     pub fn revealed(&self, i: u32) -> bool {
@@ -159,7 +170,7 @@ impl Field {
     } 
 
     pub fn reveal_all(&mut self) {
-      for i in 0..self.size {
+        for i in 0..self.size {
             self.get_cell_mut(i).revealed = true;
         }  
     }
@@ -254,7 +265,7 @@ impl Field {
                 }
             }
         }
-        rectangle([1.0, 1.0, 1.0, 0.5],
+        rectangle([0.5, 0.5, 0.5, 0.75],
                   [
                     (field_rect[0] + self.selected_x*cell_w) as f64,
                     (field_rect[1] + self.selected_y*cell_h) as f64,
@@ -310,5 +321,13 @@ impl Field {
                 }
             }
         }
+    }
+
+    pub fn get_selected_ind(&self) -> u32 {
+        self.selected_x + self.selected_y*self.width
+    }
+
+    pub fn is_victory(&self) -> bool {
+        self.nubmers_total == self.nubmers_opened
     }
 }
