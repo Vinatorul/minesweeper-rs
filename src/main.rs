@@ -6,6 +6,7 @@ extern crate find_folder;
 mod game;
 mod field;
 mod ui;
+mod common;
 
 use piston_window::*;
 use clap::{Arg, App};
