@@ -1,19 +1,13 @@
 use rand;
 use rand::Rng;
 use std::collections::VecDeque;
+use common::{ParamType, MoveDestination};
 use piston_window::*;
 
 pub enum Content {
     Number(u8),
-    Bomb,
+    Mine,
     None
-}
-
-pub enum MoveDestination {
-    Up,
-    Down,
-    Left,
-    Right
 }
 
 struct Cell {
@@ -58,19 +52,27 @@ impl Field {
             nubmers_total: 0,
             nubmers_opened: 0
         };
-        for _i in 0..field.size {
-            field.cells.push(Cell{content: Content::None,
-                                  revealed: false});
-        }
+        field.reinit_vec();
         field.fill();
         field
+    }
+
+    fn reinit_vec(&mut self) {
+        self.cells.clear();
+        self.size = self.width*self.height;
+        for _i in 0..self.size {
+            self.cells.push(Cell{content: Content::None,
+                                  revealed: false});
+        }
+        self.selected_x = self.width/2;
+        self.selected_y = self.height/2;
     }
 
     fn fill(&mut self) {
         self.clear();
         for _i in 0..self.mines {
             let ind = rand::thread_rng().gen_range(0, self.size);
-            self.get_cell_mut(ind).content = Content::Bomb
+            self.get_cell_mut(ind).content = Content::Mine
         }
         let mut i: i32 = -1;
         let w = self.width as i32;
@@ -78,24 +80,24 @@ impl Field {
             i += 1;
             match self.get_content_safe(i) {
                 Some(&Content::None) => {
-                    let ct_bomb = |b| {
+                    let ct_mine = |b| {
                         match b {
                             true => 1,
                             false => 0
                         }
                     };
                      // don`t care about row
-                    let mut ct = ct_bomb(self.is_bomb_safe(i-w)) +
-                                 ct_bomb(self.is_bomb_safe(i+w));
+                    let mut ct = ct_mine(self.is_mine_safe(i-w)) +
+                                 ct_mine(self.is_mine_safe(i+w));
                     if i % w > 0 { // check left side position
-                        ct += ct_bomb(self.is_bomb_safe(i-w-1)) +
-                              ct_bomb(self.is_bomb_safe(i-1)) +
-                              ct_bomb(self.is_bomb_safe(i+w-1));
+                        ct += ct_mine(self.is_mine_safe(i-w-1)) +
+                              ct_mine(self.is_mine_safe(i-1)) +
+                              ct_mine(self.is_mine_safe(i+w-1));
                     }
                     if i % w < w - 1 { // check right side position
-                        ct += ct_bomb(self.is_bomb_safe(i-w+1)) +
-                              ct_bomb(self.is_bomb_safe(i+1)) +
-                              ct_bomb(self.is_bomb_safe(i+w+1));
+                        ct += ct_mine(self.is_mine_safe(i-w+1)) +
+                              ct_mine(self.is_mine_safe(i+1)) +
+                              ct_mine(self.is_mine_safe(i+w+1));
                     }
                     if ct > 0 {
                         self.get_cell_mut(i as u32).content = Content::Number(ct);
@@ -150,9 +152,9 @@ impl Field {
         &self.get_cell(i).content
     }
 
-    fn is_bomb_safe(&self, i: i32) -> bool {
+    fn is_mine_safe(&self, i: i32) -> bool {
         match self.get_content_safe(i) {
-            Some(&Content::Bomb) => true,
+            Some(&Content::Mine) => true,
             _ => false
         }
     }
@@ -228,7 +230,7 @@ impl Field {
                     continue;
                 }
                 match *self.get_content(i + j*self.get_width()) {
-                    Content::Bomb => {
+                    Content::Mine => {
                         rectangle([1.0, 0.0, 0.0, 1.0],
                                   [
                                     (field_rect[0] + i*cell_w) as f64,
@@ -238,7 +240,6 @@ impl Field {
                                   ],
                                   context.transform,
                                   graphics);
-
                     },
                     Content::Number(n) => {
                         let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
@@ -274,7 +275,7 @@ impl Field {
                   ],
                   context.transform,
                   graphics);
-        for i in 0..self.get_width()+1 {
+        for i in 0..self.get_width() + 1 {
             line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
                 .draw([
                         (field_rect[0] + i*cell_w) as f64,
@@ -285,6 +286,8 @@ impl Field {
                       &context.draw_state,
                       context.transform,
                       graphics);
+        }
+        for i in 0..self.get_height() + 1 {
             line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
                 .draw([
                         field_rect[0] as f64,
@@ -329,5 +332,34 @@ impl Field {
 
     pub fn is_victory(&self) -> bool {
         self.nubmers_total == self.nubmers_opened
+    }
+
+    pub fn reinit_field(&mut self, num: u32, param: ParamType) {
+        let mut restart_neded = false;
+        match param {
+            ParamType::Height => {
+                if self.height != num {
+                    self.height = num;
+                    self.reinit_vec();
+                    restart_neded = true;
+                }
+            }
+            ParamType::Width => {
+                if self.width != num {
+                    self.width = num;
+                    self.reinit_vec();
+                    restart_neded = true;
+                }
+            }
+            ParamType::Mines => {
+                if self.mines != num {
+                    self.mines = num;
+                    restart_neded = true;
+                }
+            }
+        }
+        if restart_neded {
+            self.restart();
+        }
     }
 }
