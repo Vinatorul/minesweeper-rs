@@ -9,7 +9,12 @@ There are up to 50 bombs for the 20x15 field.
 
 Controls:
 * `R` - restart
-* `LMB` click - open a cell
+* `H` - field height setup
+* `W` - field width setup
+* `M` - mines quantity setup
+* `Arrows` to choose cell (or change settings in `setup` mode)
+* `Space` to open cell
+* `LMB` click on a cell to open
 
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
