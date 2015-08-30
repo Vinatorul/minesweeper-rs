@@ -1,4 +1,5 @@
 extern crate piston_window;
+#[macro_use]
 extern crate clap;
 extern crate rand;
 extern crate find_folder;
@@ -14,7 +15,7 @@ use clap::{Arg, App};
 fn main() {
     let matches = App::new("Minesweeper")
         .author("Alexander Kuvaev <alexander@kuvaev.me>")
-        .version("0.1")
+        .version(&*format!("v{}", crate_version!()))
         .about("Simple minesweeper in Rust ")
         .arg(Arg::from_usage("-s, --size [size] 'window size \"width\"x\"height\"'")
             .validator(|val| {
