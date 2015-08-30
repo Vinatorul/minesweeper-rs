@@ -1,6 +1,6 @@
 [root]
 name = "minesweeper"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "clap 1.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "find_folder 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",

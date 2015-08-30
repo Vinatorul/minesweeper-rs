@@ -124,7 +124,7 @@ impl<'a> Game<'a> {
                             self.ui.proc_key(ParamType::Width);
                             self.in_ui = true;
                         },
-                        _ => println!("{:?}", key)
+                        _ => {}
                     }
                 },
                 Button::Mouse(btn) => {
@@ -148,7 +148,7 @@ impl<'a> Game<'a> {
 
                             self.toggle_mark(x + y*w);
                         },
-                        _ => println!("{:?}", btn)
+                        _ => {}
                     }
                 }
             }
