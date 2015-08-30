@@ -261,7 +261,16 @@ impl Field {
                         Content::Number(n) => {
                             let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
                                                                     (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
-                            text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h).draw(
+                            rectangle([1.0, 1.0, 1.0, 1.0],
+                                      [
+                                        (field_rect[0] + i*cell_w) as f64,
+                                        (field_rect[1] + j*cell_h) as f64,
+                                        cell_w as f64,
+                                        cell_h as f64
+                                      ],
+                                      context.transform,
+                                      graphics);
+                            text::Text::colored([0.3, 0.3, 0.3, 1.0], cell_h).draw(
                                 &*n.to_string(),
                                 glyps,
                                 &context.draw_state,
