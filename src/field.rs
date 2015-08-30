@@ -125,7 +125,7 @@ impl Field {
     }
 
     pub fn reveal(&mut self, i: u32) -> &Content {
-        if !(self.revealed(i) || self.marked(i)) {
+        if !self.revealed(i) {
             if let &Content::Number(_i) = self.get_cell_mut(i).reveal() {
                 self.nubmers_opened += 1;
             }
@@ -199,16 +199,14 @@ impl Field {
                 Some(&Content::None) => {
                     if !self.revealed(x as u32) {
                         d.push_back(x);
-                        let item = self.get_cell_mut(x as u32);
-                        item.revealed = true;
-                        item.marked = false;
+                        self.get_cell_mut(x as u32).marked = false;
+                        self.reveal(x as u32);
                     }
                 },
                 Some(&Content::Number(_n)) => {
                     if !(self.revealed(x as u32)) {
-                        let item = self.get_cell_mut(x as u32);
-                        item.revealed = true;
-                        item.marked = false;
+                        self.get_cell_mut(x as u32).marked = false;
+                        self.reveal(x as u32);
                     }
                 },
                 _ => {}
@@ -362,6 +360,7 @@ impl Field {
     }
 
     pub fn is_victory(&self) -> bool {
+        println!("{} {}", self.nubmers_total, self.nubmers_opened);
         self.nubmers_total == self.nubmers_opened
     }
 

@@ -155,7 +155,7 @@ impl<'a> Game<'a> {
     }
 
     fn open_cell(&mut self, i: u32) {
-        if self.game_ended {
+        if self.game_ended || (self.field.marked(i)) {
             return;
         }
         match *self.field.reveal(i) {
