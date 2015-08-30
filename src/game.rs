@@ -110,7 +110,7 @@ impl<'a> Game<'a> {
                         },
                         Key::LCtrl | Key::RCtrl => {
                             let ind = self.field.get_selected_ind();
-                            self.field.mark(ind);
+                            self.toggle_mark(ind);
                         }
                         Key::H => {
                             self.ui.proc_key(ParamType::Height);
@@ -145,13 +145,21 @@ impl<'a> Game<'a> {
                             self.open_cell(x + y*w);
                         },
                         MouseButton::Right => {
-                            self.field.mark(x + y*w);
+
+                            self.toggle_mark(x + y*w);
                         },
                         _ => println!("{:?}", btn)
                     }
                 }
             }
         }
+    }
+
+    fn toggle_mark(&mut self, i: u32) {
+        if self.game_ended || self.field.revealed(i) {
+            return;
+        }
+        self.field.toggle_mark(i);
     }
 
     fn open_cell(&mut self, i: u32) {

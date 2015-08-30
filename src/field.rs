@@ -360,7 +360,6 @@ impl Field {
     }
 
     pub fn is_victory(&self) -> bool {
-        println!("{} {}", self.nubmers_total, self.nubmers_opened);
         self.nubmers_total == self.nubmers_opened
     }
 
@@ -393,9 +392,7 @@ impl Field {
         }
     }
 
-    pub fn mark(&mut self, i: u32) {
-        if !self.revealed(i) {
-            self.get_cell_mut(i).toggle_mark();
-        }
+    pub fn toggle_mark(&mut self, i: u32) {
+        self.get_cell_mut(i).toggle_mark();
     }
 }
