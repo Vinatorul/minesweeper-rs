@@ -5,7 +5,7 @@ Simple minesweeper in Rust
 
 ## How to Play
 
-There are up to 50 bombs for the 20x15 field.
+To win the game - open all cells with numbers. 
 
 Controls:
 * `R` - restart
@@ -15,11 +15,11 @@ Controls:
 * `Arrows` to choose cell (or change settings in `setup` mode)
 * `Space` to open cell
 * `Ctrl` to mark cell
+* `Esc` to exit
 * `LMB` click on a cell to open
 * `RMB` click on a cell to mark
 
 *Note:* marked cells disallow opennig them, until mark will be removed.
-
 
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
@@ -45,8 +45,9 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --height <height>    window height
-        --width <width>      window width
+    -f, --field <field>       field size "width"x"height"
+    -m, --mines <mines>...    max mines
+    -s, --size <size>         window size "width"x"height"
 ```
 
 # How to Contribute
