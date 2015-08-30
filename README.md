@@ -1,7 +1,7 @@
 # minesweeper-rs  [![Build Status](https://travis-ci.org/Vinatorul/minesweeper-rs.svg)](https://travis-ci.org/Vinatorul/minesweeper-rs) [![](http://meritbadge.herokuapp.com/minesweeper)](https://crates.io/crates/minesweeper) [![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Vinatorul/minesweeper-rs/blob/master/LICENSE) [![Join the chat at https://gitter.im/Vinatorul/minesweeper-rs](https://img.shields.io/badge/GITTER-JOIN%20CHAT-brightgreen.svg)](https://gitter.im/Vinatorul/minesweeper-rs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-Simple minesweeper in Rust
+Simple minesweeper in Rust based on piston_window
 
 ## How to Play
 
@@ -19,7 +19,15 @@ Controls:
 * `LMB` click on a cell to open
 * `RMB` click on a cell to mark
 
-*Note:* marked cells disallow opennig them, until mark will be removed.
+**NOTE**: marked cells disallow opennig them, until mark will be removed.
+
+## Screenshots
+
+In game screenshot (green cells are marked)
+![minesweeper ingame](ingame.png)
+
+Defeat (red cells are missed mines)
+![minesweeper defeat](defeat.png)
 
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
