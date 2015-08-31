@@ -66,7 +66,8 @@ Contributions are always welcome! Please use the following guidelines when contr
 2. Clone your fork (`git clone https://github.com/$YOUR_USERNAME/minesweeper-rs && cd minesweeper-rs`)
 3. Create new branch (`git checkout -b new-branch`)
 4. Make your changes, and commit (`git commit -am "your message"`)
- * I use a [conventional](https://github.com/ajoslin/conventional-changelog/blob/master/CONVENTIONS.md) changelog format so I can update my changelog using [clog](https://github.com/thoughtram/clog)
+ * I use a [conventional](https://github.com/ajoslin/conventional-changelog/blob/a5505865ff3dd710cf757f50530e73ef0ca641da/conventions/angular.md) changelog format so I can update my changelog using [clog](https://github.com/thoughtram/clog)
+ * In addition to the conventions defined above, I also use `imp`, `wip`, `gr`.
  * Format your commit subject line using the following format: `TYPE(COMPONENT): MESSAGE` where `TYPE` is one of the following:
     - `feat` - A new feature
     - `imp` - An improvement to an existing feature
