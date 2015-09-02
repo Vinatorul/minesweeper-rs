@@ -6,7 +6,7 @@ use piston_window::*;
 
 pub enum Content {
     Number(u8),
-    Mine,
+    Mine(bool), // bool is true when this is the mine that caused you to loose the game.
     None,
 }
 
@@ -79,7 +79,7 @@ impl Field {
         self.clear();
         for _i in 0..self.mines {
             let ind = rand::thread_rng().gen_range(0, self.size);
-            self.get_cell_mut(ind).content = Content::Mine
+            self.get_cell_mut(ind).content = Content::Mine(false); 
         }
         let mut i: i32 = -1;
         let w = self.width as i32;
@@ -141,6 +141,10 @@ impl Field {
         self.get_cell(i).marked
     }
 
+    pub fn set_killer(&mut self, i: u32) {
+        self.get_cell_mut(i).content = Content::Mine(true); 
+    }
+
     fn get_cell_mut(&mut self, i:u32) -> &mut Cell {
         self.cells.get_mut(i as usize)
             .unwrap_or_else(|| panic!("Range check error at Field::get_cell_mut ({})", i))
@@ -165,7 +169,7 @@ impl Field {
 
     fn is_mine_safe(&self, i: i32) -> bool {
         match self.get_content_safe(i) {
-            Some(&Content::Mine) => true,
+            Some(&Content::Mine(_)) => true,
             _ => false
         }
     }
@@ -262,7 +266,7 @@ impl Field {
                 */
                 if self.revealed(ind) {
                     match *self.get_content(i + j*self.get_width()) {
-                        Content::Mine => {
+                        Content::Mine(killer) => {
                             rectangle([1.0, 0.0, 0.0, 1.0],
                                       [
                                         (field_rect[0] + i*cell_w) as f64,
@@ -272,6 +276,15 @@ impl Field {
                                       ],
                                       context.transform,
                                       graphics);
+                            if killer {
+                                text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h*2/3).draw(
+                                    "*",
+                                    glyps,
+                                    &context.draw_state,
+                                    transform,
+                                    graphics
+                                );
+                            }
                         },
                         Content::Number(n) => {
                             rectangle([1.0, 1.0, 1.0, 1.0],
