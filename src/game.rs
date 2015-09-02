@@ -175,12 +175,17 @@ impl<'a> Game<'a> {
 
             for rdelta in -1..2i32 {
                 for cdelta in -1..2i32 {
-                    if on_left_edge && cdelta == -1 { continue; }
-                    if on_right_edge && cdelta == 1 { continue; } 
+                    if on_left_edge && (cdelta == -1) {
+                        continue;
+                    }
+                    if on_right_edge && (cdelta == 1) {
+                        continue;
+                    }
                     let tgt = (i as i32) + rdelta*(self.field.get_width() as i32) + cdelta;
-                    if tgt < 0 || tgt > self.field.get_size() as i32 { continue; }
+                    if (tgt < 0) || (tgt > self.field.get_size() as i32) {
+                        continue;
+                    }
                     self.check_reveal(tgt as u32);
-
                 }
             }
         }
@@ -190,7 +195,6 @@ impl<'a> Game<'a> {
         if self.field.marked(i) {
             return;
         }
-
         match *self.field.reveal(i) {
             Content::Mine => {
                 self.field.reveal_all();
