@@ -21,6 +21,8 @@ Controls:
 
 **NOTE**: marked cells disallow opennig them, until mark will be removed.
 
+**NOTE**: pressing `Space` or `LMB` on opened cell will open it's neighbors (Thanks to [waynenilsen](https://github.com/waynenilsen)!)
+
 ## Screenshots
 
 In game screenshot (green cells are marked)
