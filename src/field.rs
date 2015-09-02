@@ -268,7 +268,7 @@ impl Field {
                                       context.transform,
                                       graphics);
                             if killer {
-                                text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h*2/3).draw(
+                                text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h).draw(
                                     "*",
                                     glyps,
                                     &context.draw_state,
