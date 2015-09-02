@@ -110,6 +110,7 @@ fn main() {
 
     let window: PistonWindow =
         WindowSettings::new("Minesweeper", [width, height])
+        .opengl(OpenGL::V2_1)
         .exit_on_esc(true)
         .build()
         .unwrap();
