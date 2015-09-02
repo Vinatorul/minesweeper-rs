@@ -7,13 +7,13 @@ use piston_window::*;
 pub enum Content {
     Number(u8),
     Mine,
-    None
+    None,
 }
 
 struct Cell {
     content: Content,
     revealed: bool,
-    marked: bool
+    marked: bool,
 }
 
 impl Cell {
@@ -178,6 +178,10 @@ impl Field {
         self.height
     }
 
+    pub fn get_size(&self) -> u32 {
+        self.size
+    }
+
     pub fn restart(&mut self) {
         self.fill();
     } 
@@ -245,6 +249,17 @@ impl Field {
         for i in 0..self.get_width() {
             for j in 0..self.get_height() {
                 let ind = i + j*self.get_width();
+                let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
+                                                        (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
+                /*// show cell numbers, todo: make this a command line option
+                text::Text::colored([1.0, 1.0, 0.0, 1.0], cell_h/2 ).draw(
+                    &*ind.to_string(),
+                    glyps,
+                    &context.draw_state,
+                    transform,
+                    graphics
+                );
+                */
                 if self.revealed(ind) {
                     match *self.get_content(i + j*self.get_width()) {
                         Content::Mine => {
@@ -259,8 +274,6 @@ impl Field {
                                       graphics);
                         },
                         Content::Number(n) => {
-                            let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
-                                                                    (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
                             rectangle([1.0, 1.0, 1.0, 1.0],
                                       [
                                         (field_rect[0] + i*cell_w) as f64,
