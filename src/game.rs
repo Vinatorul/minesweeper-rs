@@ -196,9 +196,10 @@ impl<'a> Game<'a> {
             return;
         }
         match *self.field.reveal(i) {
-            Content::Mine => {
+            Content::Mine(_) => {
                 self.field.reveal_all();
                 self.game_ended = true;
+                self.field.set_killer(i); 
                 println!("Game over :(");
             },
             Content::None => {
