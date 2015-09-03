@@ -278,7 +278,7 @@ impl Field {
                             }
                         },
                         Content::Number(n) => {
-                            rectangle([1.0, 1.0, 1.0, 1.0],
+                            rectangle(color::hex("c0c0c0"),
                                       [
                                         (field_rect[0] + i*cell_w) as f64,
                                         (field_rect[1] + j*cell_h) as f64,
@@ -287,7 +287,20 @@ impl Field {
                                       ],
                                       context.transform,
                                       graphics);
-                            text::Text::colored([0.3, 0.3, 0.3, 1.0], cell_h).draw(
+
+                            let text_color = match n {
+                                1 => color::hex("0000ff"),
+                                2 => color::hex("008000"),
+                                3 => color::hex("ff0000"),
+                                4 => color::hex("000080"),
+                                5 => color::hex("800000"),
+                                6 => color::hex("008080"),
+                                7 => color::hex("000000"),
+                                8 => color::hex("808080"),
+                                _ => [0.0, 0.0, 0.0, 1.0]
+                            };
+
+                            text::Text::colored(text_color, cell_h).draw(
                                 &*n.to_string(),
                                 glyps,
                                 &context.draw_state,
@@ -296,7 +309,7 @@ impl Field {
                             );
                         },
                         Content::None => {
-                            rectangle([1.0, 1.0, 1.0, 1.0],
+                            rectangle(color::hex("c0c0c0"),
                                       [
                                         (field_rect[0] + i*cell_w) as f64,
                                         (field_rect[1] + j*cell_h) as f64,
@@ -307,6 +320,17 @@ impl Field {
                                       graphics);
                         }
                     }
+                } else {
+                    // non revealed
+                    rectangle(color::hex("303030"),
+                              [
+                                (field_rect[0] + i*cell_w) as f64,
+                                (field_rect[1] + j*cell_h) as f64,
+                                cell_w as f64,
+                                cell_h as f64
+                              ],
+                              context.transform,
+                              graphics);
                 }
                 if self.marked(ind) {
                     rectangle([0.0, 1.0, 0.0, 0.75],
