@@ -108,7 +108,7 @@ fn main() {
     if let Some(m) = matches.value_of("mines") {
         mines = m.parse().unwrap_or(mines);
     }
-    if letmatches.is_present("oldOGL") {
+    if matches.is_present("oldOGL") {
         opengl = OpenGL::V2_1;
     }
 
