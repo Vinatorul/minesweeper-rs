@@ -42,7 +42,7 @@ pub struct Field {
     selected_x: u32,
     selected_y: u32,
     nubmers_total: u32,
-    nubmers_opened: u32
+    nubmers_opened: u32,
 }
 
 impl Field {
@@ -80,11 +80,11 @@ impl Field {
         let mut rng = rand::thread_rng(); 
         let mut shuffled_idx : Vec<u32> = (0..self.size).collect();
         rng.shuffle(&mut shuffled_idx);
-        let _: Vec<&u32>  = shuffled_idx.iter()
+        let v: Vec<&u32>  = shuffled_idx.iter()
             .take(self.mines as usize)
             .inspect(|&idx| self.get_cell_mut(*idx).content = Content::Mine(false))
             .collect(); // collect is required due to lazy eval (i think).
-        
+        self.mines = v.len() as u32;
         let mut i: i32 = -1;
         let w = self.width as i32;
         while i < (self.size - 1) as i32 {
@@ -459,5 +459,9 @@ impl Field {
 
     pub fn toggle_mark(&mut self, i: u32) {
         self.get_cell_mut(i).toggle_mark();
+    }
+
+    pub fn total_mines(&self) -> u32 {
+        self.mines
     }
 }
