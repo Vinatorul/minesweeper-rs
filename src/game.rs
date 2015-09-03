@@ -34,7 +34,7 @@ impl<'a> Game<'a> {
             let field_rect = self.get_field_rect(window);
             self.field.draw(c, g, field_rect, &mut self.glyphs);
             let ui_rect = self.get_ui_rect(window);
-            self.ui.draw(c, g, ui_rect, &mut self.glyphs);
+            self.ui.draw(c, g, ui_rect, &mut self.glyphs, self.field.count_marked());
         });
     }
 

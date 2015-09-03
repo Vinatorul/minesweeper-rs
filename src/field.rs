@@ -171,6 +171,17 @@ impl Field {
         &self.get_cell(i).content
     }
 
+    pub fn count_marked(&self) -> u32 {
+        (0..self.size)
+            .fold(0, |acc, i:u32| {
+                if self.marked(i) {
+                    acc + 1
+                } else {
+                    acc
+                }
+            })
+    }
+
     fn is_mine_safe(&self, i: i32) -> bool {
         match self.get_content_safe(i) {
             Some(&Content::Mine(_)) => true,
