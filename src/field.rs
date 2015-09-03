@@ -77,10 +77,26 @@ impl Field {
 
     fn fill(&mut self) {
         self.clear();
-        for _i in 0..self.mines {
-            let ind = rand::thread_rng().gen_range(0, self.size);
-            self.get_cell_mut(ind).content = Content::Mine(false); 
+        //todo: maybe a better algorithm. for now, this
+
+        if self.mines > self.size {
+            panic!("too many mines");// avoid an infinite loop.. could retern a result
         }
+        let mut nmines = 0u32;
+        while nmines < self.mines {
+            let ind = rand::thread_rng().gen_range(0, self.size);
+            let cell = self.get_cell_mut(ind); 
+            match cell.content {
+                Content::Mine(_) => {
+                    continue;
+                },
+                _ => {
+                    cell.content = Content::Mine(false);
+                    nmines += 1;  
+                },
+            }
+        }
+        
         let mut i: i32 = -1;
         let w = self.width as i32;
         while i < (self.size - 1) as i32 {
