@@ -52,12 +52,13 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
+        --oldOGL     set OpenGL version to 2.1
     -V, --version    Prints version information
 
 OPTIONS:
-    -f, --field <field>       field size "width"x"height"
-    -m, --mines <mines>...    max mines
-    -s, --size <size>         window size "width"x"height"
+    -f, --field <field>    field size "width"x"height"
+    -m, --mines <mines>    max mines
+    -s, --size <size>      window size "width"x"height"
 ```
 
 # How to Contribute
