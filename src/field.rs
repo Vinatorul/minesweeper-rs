@@ -77,10 +77,14 @@ impl Field {
 
     fn fill(&mut self) {
         self.clear();
-        for _i in 0..self.mines {
-            let ind = rand::thread_rng().gen_range(0, self.size);
-            self.get_cell_mut(ind).content = Content::Mine(false); 
-        }
+        let mut rng = rand::thread_rng(); 
+        let mut shuffled_idx : Vec<u32> = (0..self.size).collect();
+        rng.shuffle(&mut shuffled_idx);
+        let _: Vec<&u32>  = shuffled_idx.iter()
+            .take(self.mines as usize)
+            .inspect(|&idx| self.get_cell_mut(*idx).content = Content::Mine(false))
+            .collect(); // collect is required due to lazy eval (i think).
+        
         let mut i: i32 = -1;
         let w = self.width as i32;
         while i < (self.size - 1) as i32 {
