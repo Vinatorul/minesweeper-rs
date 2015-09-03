@@ -107,7 +107,8 @@ impl<'a> Block<'a> {
 
 pub struct UI<'a> {
     blocks: Vec<Block<'a>>,
-    selected_block: i32
+    selected_block: i32,
+    mines: u32,
 }    
 
 impl<'a> UI<'a> {
@@ -117,7 +118,8 @@ impl<'a> UI<'a> {
                          Block::new("Field height", height, 'H', 5, 50, ParamType::Height),
                          Block::new("Mines", mines, 'M', 1, 2500, ParamType::Mines),
             ],
-            selected_block: -1
+            selected_block: -1,
+            mines: mines, 
         }
     }
 
@@ -125,11 +127,22 @@ impl<'a> UI<'a> {
             context: Context,
             graphics: &mut G2d,
             mut rect: [u32; 4],
-            glyps: &mut Glyphs)
+            glyps: &mut Glyphs,
+            mines_marked : u32)
     {
         for b in self.blocks.iter() {
             b.draw(context, graphics, &mut rect, glyps);
         }
+
+        let transform = context.transform.trans((rect[0]+10) as f64,
+                                                 (rect[1]+27) as f64);
+        text::Text::colored([1.0, 1.0, 1.0, 1.0], 20).draw(
+                            &*format!("{} marked {} remaining", mines_marked, self.mines - mines_marked),
+                            glyps,
+                            &context.draw_state,
+                            transform,
+                            graphics
+                        );
     }
 
     pub fn proc_key(&mut self, block: ParamType) -> Option<u32> {

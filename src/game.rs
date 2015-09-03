@@ -34,7 +34,7 @@ impl<'a> Game<'a> {
             let field_rect = self.get_field_rect(window);
             self.field.draw(c, g, field_rect, &mut self.glyphs);
             let ui_rect = self.get_ui_rect(window);
-            self.ui.draw(c, g, ui_rect, &mut self.glyphs);
+            self.ui.draw(c, g, ui_rect, &mut self.glyphs, self.field.count_marked());
         });
     }
 
@@ -182,7 +182,7 @@ impl<'a> Game<'a> {
                         continue;
                     }
                     let tgt = (i as i32) + rdelta*(self.field.get_width() as i32) + cdelta;
-                    if (tgt < 0) || (tgt > self.field.get_size() as i32) {
+                    if (tgt < 0) || (tgt >= self.field.get_size() as i32) {
                         continue;
                     }
                     self.check_reveal(tgt as u32);
