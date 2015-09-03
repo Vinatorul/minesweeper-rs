@@ -182,7 +182,7 @@ impl<'a> Game<'a> {
                         continue;
                     }
                     let tgt = (i as i32) + rdelta*(self.field.get_width() as i32) + cdelta;
-                    if (tgt < 0) || (tgt > self.field.get_size() as i32) {
+                    if (tgt < 0) || (tgt >= self.field.get_size() as i32) {
                         continue;
                     }
                     self.check_reveal(tgt as u32);
