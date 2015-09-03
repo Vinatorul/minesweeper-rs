@@ -85,8 +85,8 @@ fn main() {
                     None => Ok(())
                 }
             }))
-        .arg(Arg::from_usage("-m, --mines [mines] 'max mines'")
-            .min_values(1))
+        .arg(Arg::from_usage("-m, --mines [mines] 'max mines'"))
+        .arg(Arg::from_usage("--oldOGL 'set OpenGL version to 2.1'"))
         .get_matches();
 
     let mut width = 1024;
@@ -94,6 +94,7 @@ fn main() {
     let mut f_width = 20;
     let mut f_height = 20;
     let mut mines = 50;
+    let mut opengl = OpenGL::V3_2;
     if let Some(size) = matches.value_of("size") {
         let mut s = size.split("x");
         width = s.next().unwrap().parse().unwrap_or(width);
@@ -107,10 +108,13 @@ fn main() {
     if let Some(m) = matches.value_of("mines") {
         mines = m.parse().unwrap_or(mines);
     }
+    if letmatches.is_present("oldOGL") {
+        opengl = OpenGL::V2_1;
+    }
 
     let window: PistonWindow =
         WindowSettings::new("Minesweeper", [width, height])
-        .opengl(OpenGL::V2_1)
+        .opengl(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();
