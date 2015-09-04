@@ -117,7 +117,7 @@ fn main() {
         opengl = OpenGL::V2_1;
     }
 
-    let window: PistonWindow =
+    let mut window: PistonWindow =
         WindowSettings::new("Minesweeper", [width, height])
         .opengl(opengl)
         .exit_on_esc(true)
