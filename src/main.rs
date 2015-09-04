@@ -87,6 +87,7 @@ fn main() {
             }))
         .arg(Arg::from_usage("-m, --mines [mines] 'max mines'"))
         .arg(Arg::from_usage("--oldOGL 'set OpenGL version to 2.1'"))
+        .arg(Arg::from_usage("--maxFPS [max_fps] 'set max fps'"))
         .get_matches();
 
     let mut width = 1024;
@@ -94,6 +95,7 @@ fn main() {
     let mut f_width = 20;
     let mut f_height = 20;
     let mut mines = 50;
+    let mut max_fps = 60;
     let mut opengl = OpenGL::V3_2;
     if let Some(size) = matches.value_of("size") {
         let mut s = size.split("x");
@@ -107,6 +109,9 @@ fn main() {
     }
     if let Some(m) = matches.value_of("mines") {
         mines = m.parse().unwrap_or(mines);
+    }
+    if let Some(m) = matches.value_of("max_fps") {
+        max_fps = m.parse().unwrap_or(max_fps);
     }
     if matches.is_present("oldOGL") {
         opengl = OpenGL::V2_1;
@@ -126,7 +131,7 @@ fn main() {
     let glyphs = Glyphs::new(font, factory).unwrap();
 
     let mut game = game::Game::new(glyphs, f_width, f_height, mines);
-
+    window.set_max_fps(max_fps);
     for e in window {
         game.render(&e);
 
