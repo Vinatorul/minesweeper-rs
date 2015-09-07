@@ -4,7 +4,7 @@ version = "1.0.0"
 dependencies = [
  "clap 1.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "find_folder 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston_window 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "piston_window 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -30,11 +30,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "bitflags"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "bitflags"
-version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -116,10 +111,10 @@ dependencies = [
 
 [[package]]
 name = "draw_state"
-version = "0.1.2"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "bitflags 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -154,10 +149,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "freetype-rs"
-version = "0.1.3"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "bitflags 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "freetype-sys 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -191,21 +186,21 @@ dependencies = [
 
 [[package]]
 name = "gfx"
-version = "0.6.5"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "bitflags 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "draw_state 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "draw_state 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "num 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "gfx_device_gl"
-version = "0.4.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gfx 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_gl 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -451,10 +446,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "piston-gfx_texture"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gfx 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "image 0.3.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston-texture 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -479,24 +474,23 @@ dependencies = [
 
 [[package]]
 name = "piston2d-gfx_graphics"
-version = "0.4.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "freetype-rs 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "gfx 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston-gfx_texture 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "freetype-rs 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "piston-gfx_texture 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston-shaders_graphics2d 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston2d-graphics 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "piston2d-graphics 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "piston2d-graphics"
-version = "0.4.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "draw_state 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "draw_state 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "interpolation 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "num 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston-texture 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston-viewport 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "read_color 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -505,14 +499,14 @@ dependencies = [
 
 [[package]]
 name = "piston_window"
-version = "0.15.0"
+version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gfx 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "gfx_device_gl 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx_device_gl 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston2d-gfx_graphics 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston2d-graphics 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "piston2d-gfx_graphics 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "piston2d-graphics 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pistoncore-glutin_window 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "shader_version 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
