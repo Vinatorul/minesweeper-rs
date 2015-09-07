@@ -4,6 +4,6 @@ rust:
   - beta
   - stable
 
-matrix:
-  allow_failures:
-    - rust: nightly
+#matrix:
+#  allow_failures:
+#    - rust: nightly
