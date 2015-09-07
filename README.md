@@ -21,15 +21,17 @@ Controls:
 
 **NOTE**: marked cells disallow opennig them, until mark will be removed.
 
-**NOTE**: pressing `Space` or `LMB` on opened cell will open it's neighbors (Thanks to [waynenilsen](https://github.com/waynenilsen)!)
+**NOTE**: pressing `Space` or `LMB` on opened cell will open it's neighbors (Thanks to [waynenilsen](https://github.com/waynenilsen) and [xilec](https://github.com/xilec)!)
 
 ## Screenshots
 
 In game screenshot (green cells are marked)
 ![minesweeper ingame](ingame.png)
+**NOTE**: you can see counter of marked cells at the right of the window
 
 Defeat (red cells are missed mines)
 ![minesweeper defeat](defeat.png)
+**NOTE**: with `*` marked mines which ended the game
 
 ## License
 `minesweeper` is licensed under the MIT license. Please read the LICENSE file in this repository for more information.
@@ -56,9 +58,10 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -f, --field <field>    field size "width"x"height"
-    -m, --mines <mines>    max mines
-    -s, --size <size>      window size "width"x"height"
+    -f, --field <field>       field size "width"x"height"
+        --maxFPS <max_fps>    set max fps
+    -m, --mines <mines>       max mines
+    -s, --size <size>         window size "width"x"height"
 ```
 
 # How to Contribute
@@ -87,7 +90,3 @@ Contributions are always welcome! Please use the following guidelines when contr
 6. `git rebase` into concise commits and remove `--fixup`s (`git rebase -i HEAD~NUM` where `NUM` is number of commits back)
 7. Push your changes back to your fork (`git push origin $your-branch`)
 8. Create a pull request! (You can also create the pull request first, and we'll merge when ready. This a good way to discuss proposed changes.)
-
-## Dependencies Tree
-
-![minesweeper dependencies](minesweeper.png)
