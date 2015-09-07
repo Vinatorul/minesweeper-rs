@@ -120,6 +120,35 @@ impl Field {
         }
     }
 
+    pub fn get_cell_index(&mut self, x: u32, y: u32) -> u32 {
+        x + y * self.width
+    }
+
+    pub fn get_coord(&mut self, ind: u32) -> (u32, u32){
+        (ind % self.width, ind / self.width)
+    }
+
+    pub fn get_neighborhood_count(&mut self, i: u32) -> u8 {
+        let (x, y) = self.get_coord(i);
+        
+        let begin_x = if x > 0 { x - 1 } else { x };
+        let end_x = if x + 1 < self.width { x + 1 } else { x };
+        let begin_y = if y > 0 { y - 1 } else { y };
+        let end_y = if y + 1 < self.height { y + 1 } else { y };
+
+        let mut marked_count = 0u8;
+        for yi in begin_y .. end_y + 1 {
+            for xi in begin_x .. end_x + 1 {
+                let ind = self.get_cell_index(xi, yi);
+                if self.marked(ind) {
+                    marked_count += 1;
+                }
+            }
+        }
+
+        marked_count
+    }
+
     fn clear(&mut self) {
         for i in 0..self.size {
             self.get_cell_mut(i).clear();
@@ -420,8 +449,10 @@ impl Field {
         }
     }
 
-    pub fn get_selected_ind(&self) -> u32 {
-        self.selected_x + self.selected_y*self.width
+    pub fn get_selected_ind(&mut self) -> u32 {
+        let x = self.selected_x;
+        let y = self.selected_y;
+        self.get_cell_index(x, y)
     }
 
     pub fn is_victory(&self) -> bool {
