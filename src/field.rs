@@ -312,13 +312,12 @@ impl Field {
                                       context.transform,
                                       graphics);
                             if killer {
-                                text::Text::colored([1.0, 1.0, 1.0, 1.0], cell_h).draw(
-                                    "*",
-                                    glyps,
-                                    &context.draw_state,
-                                    transform,
-                                    graphics
-                                );
+                                text([1.0, 1.0, 1.0, 1.0],
+                                     cell_h,
+                                     "*",
+                                     glyps,
+                                     transform,
+                                     graphics);
                             }
                         },
                         Content::Number(n) => {
@@ -343,14 +342,12 @@ impl Field {
                                 8 => color::hex("808080"),
                                 _ => [0.0, 0.0, 0.0, 1.0]
                             };
-
-                            text::Text::colored(text_color, cell_h).draw(
-                                &*n.to_string(),
-                                glyps,
-                                &context.draw_state,
-                                transform,
-                                graphics
-                            );
+                            text(text_color,
+                                 cell_h,
+                                 &*n.to_string(),
+                                 glyps,
+                                 transform,
+                                 graphics);
                         },
                         Content::None => {
                             rectangle(color::hex("c0c0c0"),
@@ -399,28 +396,28 @@ impl Field {
                   context.transform,
                   graphics);
         for i in 0..self.get_width() + 1 {
-            line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                .draw([
-                        (field_rect[0] + i*cell_w) as f64,
-                        field_rect[1] as f64,
-                        (field_rect[0] + i*cell_w) as f64,
-                        (field_rect[1] + field_rect[3]) as f64
-                      ],
-                      &context.draw_state,
-                      context.transform,
-                      graphics);
+            line([0.5, 0.5, 0.5, 1.0],
+                 1.0,
+                 [
+                    (field_rect[0] + i*cell_w) as f64,
+                    field_rect[1] as f64,
+                    (field_rect[0] + i*cell_w) as f64,
+                    (field_rect[1] + field_rect[3]) as f64
+                 ],
+                 context.transform,
+                 graphics);
         }
         for i in 0..self.get_height() + 1 {
-            line::Line::new([0.5, 0.5, 0.5, 1.0], 1.0)
-                .draw([
-                        field_rect[0] as f64,
-                        (field_rect[1] + i*cell_h) as f64,
-                        (field_rect[0] + field_rect[2]) as f64,
-                        (field_rect[1] + i*cell_h) as f64
-                      ],
-                      &context.draw_state,
-                      context.transform,
-                      graphics);
+            line([0.5, 0.5, 0.5, 1.0],
+                 1.0,
+                 [
+                    field_rect[0] as f64,
+                    (field_rect[1] + i*cell_h) as f64,
+                    (field_rect[0] + field_rect[2]) as f64,
+                    (field_rect[1] + i*cell_h) as f64
+                 ],
+                 context.transform,
+                 graphics);
         }
     }
 

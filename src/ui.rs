@@ -60,13 +60,12 @@ impl<'a> Block<'a> {
         rect[1] += block_height;
         let transform = context.transform.trans((rect[0] + margin + text_padding) as f64,
                                                 (rect[1] - text_padding) as f64);
-        text::Text::colored([0.0, 0.0, 0.0, 1.0], text_height).draw(
-                            &*format!("{}: {}", self.name, self.num),
-                            glyps,
-                            &context.draw_state,
-                            transform,
-                            graphics
-                        );
+        text([0.0, 0.0, 0.0, 1.0],
+             text_height,
+             &*format!("{}: {}", self.name, self.num),
+             glyps,
+             transform,
+             graphics);
         rect[1] += margin + text_height/2;
         let transform = context.transform.trans((rect[0] + margin) as f64,
                                                 (rect[1]) as f64);
@@ -75,13 +74,12 @@ impl<'a> Block<'a> {
         } else {
             format!("Press \"{}\" to change", self.hotkey)
         };
-        text::Text::colored([1.0, 1.0, 1.0, 1.0], text_height).draw(
-                            &*s,
-                            glyps,
-                            &context.draw_state,
-                            transform,
-                            graphics
-                        );
+        text([1.0, 1.0, 1.0, 1.0],
+             text_height,
+             &*s,
+             glyps,
+             transform,
+             graphics);
     }
 
     pub fn inc_safe(&mut self) {
@@ -135,13 +133,12 @@ impl<'a> UI<'a> {
 
         let transform = context.transform.trans((rect[0]+10) as f64,
                                                  (rect[1]+27) as f64);
-        text::Text::colored([1.0, 1.0, 1.0, 1.0], 20).draw(
-                            &*format!("{} marked {} remaining", mines_marked, mines_total as i32 - mines_marked as i32),
-                            glyps,
-                            &context.draw_state,
-                            transform,
-                            graphics
-                        );
+        text([1.0, 1.0, 1.0, 1.0],
+             20,
+             &*format!("{} marked {} remaining", mines_marked, mines_total as i32 - mines_marked as i32),
+             glyps,
+             transform,
+             graphics);
     }
 
     pub fn proc_key(&mut self, block: ParamType) -> Option<u32> {
