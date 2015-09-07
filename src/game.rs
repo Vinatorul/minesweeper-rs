@@ -170,22 +170,38 @@ impl<'a> Game<'a> {
         if !self.field.revealed(i) {
             self.check_reveal(i);
         } else {
-            let on_left_edge = i % self.field.get_width() == 0;
-            let on_right_edge = (i+1) % self.field.get_width() == 0; 
+            self.reveal_neighborhood(i);
+        }
+    }
 
-            for rdelta in -1..2i32 {
-                for cdelta in -1..2i32 {
-                    if on_left_edge && (cdelta == -1) {
-                        continue;
+    fn reveal_neighborhood(&mut self, i: u32) {
+        let cells_count_opt = {
+            if let &Content::Number(cells_count) = self.field.get_content(i) {
+                Some(cells_count)
+            } else {
+                None
+            }
+        };
+
+        if let Some(cells_count) = cells_count_opt {
+            if self.field.get_neighborhood_count(i) == cells_count {
+                let on_left_edge = i % self.field.get_width() == 0;
+                let on_right_edge = (i+1) % self.field.get_width() == 0; 
+
+                for rdelta in -1..2i32 {
+                    for cdelta in -1..2i32 {
+                        if on_left_edge && (cdelta == -1) {
+                            continue;
+                        }
+                        if on_right_edge && (cdelta == 1) {
+                            continue;
+                        }
+                        let tgt = (i as i32) + rdelta*(self.field.get_width() as i32) + cdelta;
+                        if (tgt < 0) || (tgt >= self.field.get_size() as i32) {
+                            continue;
+                        }
+                        self.check_reveal(tgt as u32);
                     }
-                    if on_right_edge && (cdelta == 1) {
-                        continue;
-                    }
-                    let tgt = (i as i32) + rdelta*(self.field.get_width() as i32) + cdelta;
-                    if (tgt < 0) || (tgt >= self.field.get_size() as i32) {
-                        continue;
-                    }
-                    self.check_reveal(tgt as u32);
                 }
             }
         }
