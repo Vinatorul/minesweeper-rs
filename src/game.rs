@@ -1,11 +1,13 @@
 use field::{Field, Content};
 use ui::UI;
+use ui::EndMessage;
 use piston_window::*;
-use common::{ParamType, MoveDestination};
+use common::{ParamType, MoveDestination, GameEndState};
 
 pub struct Game<'a> {
     field: Field,
     ui: UI<'a>,
+    msg: EndMessage<'a>,
     glyphs: Glyphs,
     mouse_x: f64,
     mouse_y: f64,
@@ -19,6 +21,7 @@ impl<'a> Game<'a> {
         Game {
             field: Field::new(width, height, mines),
             ui: UI::new(width, height, mines),
+            msg: EndMessage::new(),
             glyphs: glyphs,
             mouse_x: 0.0,
             mouse_y: 0.0,
@@ -33,8 +36,12 @@ impl<'a> Game<'a> {
             clear([0.0, 0.0, 0.0, 1.0], g);
             let field_rect = self.get_field_rect(window);
             self.field.draw(c, g, field_rect, &mut self.glyphs);
+
             let ui_rect = self.get_ui_rect(window);
             self.ui.draw(c, g, ui_rect, &mut self.glyphs, self.field.total_mines(), self.field.count_marked());
+
+            let msg_rect = self.get_msg_rect(window);
+            self.msg.draw(c, g, msg_rect, &mut self.glyphs);
         });
     }
 
@@ -53,6 +60,19 @@ impl<'a> Game<'a> {
         let h = window.size().height;
         [field_w, 0, w, h]
     }
+    
+    fn get_msg_rect(&self, window: &PistonWindow) -> [u32; 4] {
+        let w_w = window.size().width;
+        let w_h = window.size().height;
+        let (m_w, m_h) = EndMessage::size();
+
+        [
+            ( (w_w-m_w) / 2 ),
+            ( (w_h-m_h) / 2 ),
+            m_w,
+            m_h        
+        ]
+    }
 
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
         if self.in_ui {
@@ -63,6 +83,7 @@ impl<'a> Game<'a> {
                             match self.ui.proc_key(ParamType::Height) {
                                 Some(h) => {
                                     self.in_ui = false;
+                                    self.msg.hide();
                                     self.field.reinit_field(h, ParamType::Height);
                                 }
                                 _ => {}
@@ -72,6 +93,7 @@ impl<'a> Game<'a> {
                             match self.ui.proc_key(ParamType::Mines) {
                                 Some(m) => {
                                     self.in_ui = false;
+                                    self.msg.hide();
                                     self.field.reinit_field(m, ParamType::Mines);
                                 }
                                 _ => {}
@@ -81,6 +103,7 @@ impl<'a> Game<'a> {
                             match self.ui.proc_key(ParamType::Width) {
                                 Some(w) => {
                                     self.in_ui = false;
+                                    self.msg.hide();
                                     self.field.reinit_field(w, ParamType::Width);
                                 }
                                 _ => {}
@@ -215,18 +238,21 @@ impl<'a> Game<'a> {
             Content::Mine(_) => {
                 self.field.reveal_all();
                 self.game_ended = true;
-                self.field.set_killer(i); 
+                self.field.set_killer(i);
+                self.msg.show( GameEndState::Lose );
                 println!("Game over :(");
             },
             Content::None => {
                 self.field.chain_reveal(i);
                 if self.field.is_victory() {
+                    self.msg.show( GameEndState::Win );
                     println!("You win :)");
                     self.game_ended = true;
                 }
             }
             Content::Number(_i) => {
                 if self.field.is_victory() {
+                    self.msg.show( GameEndState::Win );
                     println!("You win :)");
                     self.game_ended = true;
                 } 
@@ -241,6 +267,7 @@ impl<'a> Game<'a> {
 
     fn restart(&mut self) {
         self.game_ended = false;
+        self.msg.hide();
         self.field.restart();
     }
 }

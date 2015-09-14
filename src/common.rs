@@ -11,3 +11,8 @@ pub enum MoveDestination {
     Left,
     Right
 }
+
+pub enum GameEndState {
+    Win,
+    Lose
+}
