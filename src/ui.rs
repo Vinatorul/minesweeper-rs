@@ -70,9 +70,9 @@ impl<'a> Block<'a> {
         let transform = context.transform.trans((rect[0] + margin) as f64,
                                                 (rect[1]) as f64);
         let s = if self.selected {
-            format!("Use arrows, press \"{}\" to apply changes", self.hotkey)
+            format!("Use arrows, press '{}' to apply changes", self.hotkey)
         } else {
-            format!("Press \"{}\" to change", self.hotkey)
+            format!("Press '{}' to change", self.hotkey)
         };
         text([1.0, 1.0, 1.0, 1.0],
              text_height,
@@ -186,7 +186,7 @@ static EM_TEXT_PADDING  : u32 = 5;
 static EM_BORDER_WIDTH  : u32 = 3;
 static EM_BORDER_WIDTH_2: u32 = 6;
 
-static RETRY_MSG: &'static str = "Press 'R' to retry.";
+static RETRY_MSG: &'static str = "Press 'R' to play again";
 
 impl<'a> EndMessage<'a> {
     pub fn new() -> EndMessage<'a> {
@@ -217,7 +217,7 @@ impl<'a> EndMessage<'a> {
     pub fn size() -> (u32,u32) {
         (
             350,
-            (EM_TEXT_BIG + EM_TEXT_SMALL + (EM_TEXT_PADDING*3) + (EM_BORDER_WIDTH*2))
+            (EM_TEXT_BIG + EM_TEXT_SMALL + (EM_TEXT_PADDING*4) + (EM_BORDER_WIDTH*2))
         )
     }
 
@@ -272,10 +272,10 @@ impl<'a> EndMessage<'a> {
              trans_msg,
              graphics);
 
-        // Draw 'retry' message
+        // Draw 'play again' message
         let trans_retry = context.transform.trans(
             (rect[0] + EM_BORDER_WIDTH + EM_TEXT_PADDING) as f64,
-            (rect[1] + EM_BORDER_WIDTH + EM_TEXT_PADDING + EM_TEXT_BIG + EM_TEXT_SMALL) as f64);
+            (rect[1] + EM_BORDER_WIDTH + EM_TEXT_PADDING*2 + EM_TEXT_BIG + EM_TEXT_SMALL) as f64);
         text([0.0, 0.0, 0.0, 1.0],
              EM_TEXT_SMALL,
              &*RETRY_MSG,
