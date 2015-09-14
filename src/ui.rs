@@ -1,5 +1,5 @@
 use piston_window::*;
-use common::{ParamType, MoveDestination};
+use common::{ParamType, MoveDestination, GameEndState};
 
 struct Block<'a> {
     name: &'a str, 
@@ -171,5 +171,116 @@ impl<'a> UI<'a> {
             MoveDestination::Up | MoveDestination::Right => selected.inc_safe(),
             MoveDestination::Down | MoveDestination::Left => selected.dec_safe()
         }
+    }
+}
+
+pub struct EndMessage<'a> {
+    visible: bool,
+    win: bool,
+    message: &'a str
+}
+
+static EM_TEXT_BIG      : u32 = 40;
+static EM_TEXT_SMALL    : u32 = 20;
+static EM_TEXT_PADDING  : u32 = 5;
+static EM_BORDER_WIDTH  : u32 = 3;
+static EM_BORDER_WIDTH_2: u32 = 6;
+
+static RETRY_MSG: &'static str = "Press 'R' to retry.";
+
+impl<'a> EndMessage<'a> {
+    pub fn new() -> EndMessage<'a> {
+        EndMessage {
+            visible: false,
+            win: false,
+            message: "Ready",
+        }
+    }
+
+    pub fn show( &mut self, end_state: GameEndState ) {
+        self.win = match end_state {
+            GameEndState::Win => true,
+            _                 => false };
+        self.visible = true;
+        self.message = if self.win {
+                "You WIN :)"
+            } else {
+                "Game over :("
+            };
+    }
+
+    pub fn hide( &mut self ) {
+        self.visible = false;
+    }
+
+    /// Message Box's size. (width,height).
+    pub fn size() -> (u32,u32) {
+        (
+            350,
+            (EM_TEXT_BIG + EM_TEXT_SMALL + (EM_TEXT_PADDING*3) + (EM_BORDER_WIDTH*2))
+        )
+    }
+
+    pub fn draw(&self,
+        context: Context,
+        graphics: &mut G2d,
+        rect: [u32; 4],
+        glyps: &mut Glyphs)
+    {
+        if !self.visible
+        {
+            return;
+        }
+
+        let border_color = if self.win {
+            [0.0, 0.0, 1.0, 1.0]    // Win : Blue
+        } else {
+            [1.0, 1.0, 0.0, 1.0]    // Lose: yellow
+        };
+
+        // draw border
+        rectangle(border_color,
+            [
+                (rect[0]) as f64,
+                (rect[1]) as f64,
+                (rect[2]) as f64,
+                (rect[3]) as f64
+            ],
+            context.transform,
+            graphics);
+
+        // draw background
+        rectangle( [1.0, 1.0, 1.0, 1.0],
+            [
+                (rect[0] +EM_BORDER_WIDTH) as f64,
+                (rect[1] +EM_BORDER_WIDTH) as f64,
+                (rect[2] -EM_BORDER_WIDTH_2) as f64,
+                (rect[3] -EM_BORDER_WIDTH_2) as f64
+            ],
+            context.transform,
+            graphics);
+
+        // Draw game result message
+        let trans_msg = context.transform.trans(
+            (rect[0] + EM_BORDER_WIDTH + EM_TEXT_PADDING) as f64,
+            (rect[1] + EM_BORDER_WIDTH + EM_TEXT_PADDING + EM_TEXT_BIG) as f64);
+
+        text([0.0, 0.0, 0.0, 1.0],
+             EM_TEXT_BIG,
+             &*self.message,
+             glyps,
+             trans_msg,
+             graphics);
+
+        // Draw 'retry' message
+        let trans_retry = context.transform.trans(
+            (rect[0] + EM_BORDER_WIDTH + EM_TEXT_PADDING) as f64,
+            (rect[1] + EM_BORDER_WIDTH + EM_TEXT_PADDING + EM_TEXT_BIG + EM_TEXT_SMALL) as f64);
+        text([0.0, 0.0, 0.0, 1.0],
+             EM_TEXT_SMALL,
+             &*RETRY_MSG,
+             glyps,
+             trans_retry,
+             graphics);
     }
 }
