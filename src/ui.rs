@@ -1,5 +1,7 @@
+
 use piston_window::*;
 use common::{ParamType, MoveDestination, GameEndState};
+use chrono::Duration;
 
 struct Block<'a> {
     name: &'a str, 
@@ -9,7 +11,7 @@ struct Block<'a> {
     selected: bool,
     min_val: u32,
     max_val: u32,
-    param_type: ParamType
+    param_type: ParamType,
 }
 
 impl<'a> Block<'a> {
@@ -28,7 +30,7 @@ impl<'a> Block<'a> {
             selected: false,
             min_val: min_val,
             max_val: max_val,
-            param_type: param_type
+            param_type: param_type,
         }
     }
 
@@ -125,7 +127,8 @@ impl<'a> UI<'a> {
             mut rect: [u32; 4],
             glyps: &mut Glyphs,
             mines_total: u32,
-            mines_marked: u32)
+            mines_marked: u32,
+            duration : Duration)
     {
         for b in self.blocks.iter() {
             b.draw(context, graphics, &mut rect, glyps);
@@ -136,6 +139,19 @@ impl<'a> UI<'a> {
         text([1.0, 1.0, 1.0, 1.0],
              20,
              &*format!("{} marked {} remaining", mines_marked, mines_total as i32 - mines_marked as i32),
+             glyps,
+             transform,
+             graphics);
+        
+        let transform = context.transform.trans((rect[0]+10) as f64,
+                                                 (rect[1]+27*2) as f64);
+        let total_seconds = duration.num_seconds();
+        let mins = total_seconds / 60;
+        let rem_seconds = total_seconds - mins*60;
+
+        text([1.0, 1.0, 1.0, 1.0],
+             20,
+             &*format!("{}:{}", mins, rem_seconds),
              glyps,
              transform,
              graphics);
