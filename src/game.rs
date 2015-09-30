@@ -3,6 +3,7 @@ use ui::UI;
 use ui::EndMessage;
 use piston_window::*;
 use common::{ParamType, MoveDestination, GameEndState};
+use chrono::{DateTime, UTC, Duration};  
 
 pub struct Game<'a> {
     field: Field,
@@ -13,7 +14,9 @@ pub struct Game<'a> {
     mouse_y: f64,
     game_ended: bool,
     panel_width: u32,
-    in_ui: bool
+    in_ui: bool,
+    game_start : Option<DateTime<UTC>>,
+    game_end : Option<DateTime<UTC>>,
 }
 
 impl<'a> Game<'a> {
@@ -27,7 +30,9 @@ impl<'a> Game<'a> {
             mouse_y: 0.0,
             game_ended: false,
             panel_width: 350,
-            in_ui: false
+            in_ui: false,
+            game_start: None,
+            game_end : None,
         }
     }
 
@@ -38,7 +43,16 @@ impl<'a> Game<'a> {
             self.field.draw(c, g, field_rect, &mut self.glyphs);
 
             let ui_rect = self.get_ui_rect(window);
-            self.ui.draw(c, g, ui_rect, &mut self.glyphs, self.field.total_mines(), self.field.count_marked());
+
+            let dur = match self.game_start {
+                Some(game_start) => match self.game_end {
+                    Some(game_end) => game_end - game_start,
+                    None => UTC::now() - game_start,
+                },
+                None => Duration::seconds(0), 
+            };
+
+            self.ui.draw(c, g, ui_rect, &mut self.glyphs, self.field.total_mines(), self.field.count_marked(), dur);
 
             let msg_rect = self.get_msg_rect(window);
             self.msg.draw(c, g, msg_rect, &mut self.glyphs);
@@ -189,7 +203,10 @@ impl<'a> Game<'a> {
         if self.game_ended {
             return;
         }
-        
+        if self.game_start == None {
+            self.game_start = Some(UTC::now()); 
+        }
+
         if !self.field.revealed(i) {
             self.check_reveal(i);
         } else {
@@ -239,6 +256,7 @@ impl<'a> Game<'a> {
                 self.field.reveal_all();
                 self.game_ended = true;
                 self.field.set_killer(i);
+                self.game_end = Some(UTC::now()); 
                 self.msg.show( GameEndState::Lose );
                 println!("Game over :(");
             },
@@ -248,6 +266,7 @@ impl<'a> Game<'a> {
                     self.msg.show( GameEndState::Win );
                     println!("You win :)");
                     self.game_ended = true;
+                    self.game_end = Some(UTC::now()); 
                 }
             }
             Content::Number(_i) => {
@@ -255,6 +274,7 @@ impl<'a> Game<'a> {
                     self.msg.show( GameEndState::Win );
                     println!("You win :)");
                     self.game_ended = true;
+                    self.game_end = Some(UTC::now()); 
                 } 
             }
         }
@@ -268,6 +288,8 @@ impl<'a> Game<'a> {
     fn restart(&mut self) {
         self.game_ended = false;
         self.msg.hide();
+        self.game_start = None;
+        self.game_end = None; 
         self.field.restart();
     }
 }

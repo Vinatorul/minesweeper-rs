@@ -1,6 +1,7 @@
 extern crate piston_window;
 #[macro_use]
 extern crate clap;
+extern crate chrono;
 extern crate rand;
 extern crate find_folder;
 
