@@ -5,6 +5,35 @@ use piston_window::*;
 use common::{ParamType, MoveDestination, GameEndState};
 use chrono::{DateTime, UTC, Duration};  
 
+enum RenderState {
+    // redraw picture on current buffer
+    First,
+
+    // redraw picture on next buffer
+    Second,
+
+    // needn't redraw picture
+    None
+}
+
+impl RenderState {
+
+    // Update render state and return flag necessity of redrawing pickture
+    fn update_state(&mut self) -> bool {
+        match *self {
+            RenderState::First  => *self = RenderState::Second,
+            RenderState::Second => *self = RenderState::None,
+            RenderState::None   => return false
+        }
+
+        true
+    }
+
+    fn reset(&mut self) {
+        *self = RenderState::First
+    }
+}
+
 pub struct Game<'a> {
     field: Field,
     ui: UI<'a>,
@@ -16,7 +45,10 @@ pub struct Game<'a> {
     panel_width: u32,
     in_ui: bool,
     game_start : Option<DateTime<UTC>>,
+    last_time : Option<DateTime<UTC>>,
     game_end : Option<DateTime<UTC>>,
+    // state of rendering for drawing picture on both buffers
+    render_state: RenderState
 }
 
 impl<'a> Game<'a> {
@@ -32,11 +64,17 @@ impl<'a> Game<'a> {
             panel_width: 350,
             in_ui: false,
             game_start: None,
-            game_end : None,
+            game_end: None,
+            last_time: None,
+            render_state: RenderState::First
         }
     }
 
     pub fn render(&mut self, window: &PistonWindow) {      
+        if !self.render_state.update_state() {
+            return;
+        }
+
         window.draw_2d(|c, g| {
             clear([0.0, 0.0, 0.0, 1.0], g);
             let field_rect = self.get_field_rect(window);
@@ -89,6 +127,7 @@ impl<'a> Game<'a> {
     }
 
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
+        let mut need_redraw = true;
         if self.in_ui {
             match button {
                 Button::Keyboard(key) => {
@@ -100,7 +139,7 @@ impl<'a> Game<'a> {
                                     self.msg.hide();
                                     self.field.reinit_field(h, ParamType::Height);
                                 }
-                                _ => {}
+                                _ => need_redraw = false
                             }
                         },
                         Key::M => {
@@ -110,7 +149,7 @@ impl<'a> Game<'a> {
                                     self.msg.hide();
                                     self.field.reinit_field(m, ParamType::Mines);
                                 }
-                                _ => {}
+                                _ => need_redraw = false
                             }
                         },
                         Key::W => {
@@ -120,17 +159,17 @@ impl<'a> Game<'a> {
                                     self.msg.hide();
                                     self.field.reinit_field(w, ParamType::Width);
                                 }
-                                _ => {}
+                                _ => need_redraw = false
                             }
                         },
                         Key::Up => self.ui.change_selected(MoveDestination::Up),
                         Key::Down => self.ui.change_selected(MoveDestination::Down),
                         Key::Left => self.ui.change_selected(MoveDestination::Left),
                         Key::Right => self.ui.change_selected(MoveDestination::Right),
-                        _ => {}
+                        _ => need_redraw = false
                     }
                 }
-                _ => {}
+                _ => need_redraw = false
             }
         } else {
             match button {
@@ -161,7 +200,7 @@ impl<'a> Game<'a> {
                             self.ui.proc_key(ParamType::Width);
                             self.in_ui = true;
                         },
-                        _ => {}
+                        _ => need_redraw = false
                     }
                 },
                 Button::Mouse(btn) => {
@@ -185,10 +224,14 @@ impl<'a> Game<'a> {
 
                             self.toggle_mark(x + y*w);
                         },
-                        _ => {}
+                        _ => need_redraw = false
                     }
                 }
             }
+        }
+
+        if need_redraw {
+            self.render_state.reset();
         }
     }
 
@@ -285,11 +328,31 @@ impl<'a> Game<'a> {
         self.mouse_y = mouse_rel[1];
     }
 
+    pub fn update_state(&mut self) {
+        if let Some(_) = self.game_start {
+            if let None = self.game_end {
+                let now = UTC::now();
+                match self.last_time {
+                    Some(last_time) => {
+                        let time_from_last_tick = now - last_time;
+                        if time_from_last_tick >= Duration::seconds(1) {
+                            self.last_time = Some(now);
+                            self.render_state.reset();
+                        }
+                    },
+                    None => self.last_time = Some(now),
+                }
+            }
+        }
+    }
+
     fn restart(&mut self) {
         self.game_ended = false;
         self.msg.hide();
         self.game_start = None;
         self.game_end = None; 
+        self.last_time = None;
         self.field.restart();
+        self.render_state.reset();
     }
 }
