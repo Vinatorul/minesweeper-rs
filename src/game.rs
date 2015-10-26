@@ -227,8 +227,9 @@ impl<'a> Game<'a> {
                         _ => need_redraw = false
                     }
                 }
-                Button::Joystick(btn) => {
-                    println!("{:?}", btn);
+                Button::Joystick(_) => {
+                    // Doen't work for me (Logitech Rumble F510)
+                    // println!("{:?}", btn);
                 }
             }
         }

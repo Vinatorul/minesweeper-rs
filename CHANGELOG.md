@@ -1,3 +1,19 @@
+<a name="v1.2"></a>
+##  (2015-10-26)
+
+
+#### Improvements
+
+*   Display game result on GUI. ([e99e267f](https://github.com/Vinatorul/minesweeper-rs/commit/e99e267f33abdd071a405ba4337d5cce7ab37557))
+
+*	Implement redrawing when it needs for fixing. ([9793bc38](https://github.com/Vinatorul/minesweeper-rs/commit/9793bc38041836098792bb55e210d40b6583e43a))
+
+#### Features
+
+*   added the timer ([eaecc403](https://github.com/Vinatorul/minesweeper-rs/commit/eaecc4035720e1c47c3a1591745a60525edb7395))
+
+
+
 <a name="v1.1"></a>
 ##  (2015-09-07)
 
