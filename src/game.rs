@@ -227,6 +227,9 @@ impl<'a> Game<'a> {
                         _ => need_redraw = false
                     }
                 }
+                Button::Joystick(btn) => {
+                    println!("{:?}", btn);
+                }
             }
         }
 
