@@ -134,7 +134,15 @@ fn main() {
     let mut game = game::Game::new(glyphs, f_width, f_height, mines);
     window.set_max_fps(max_fps);
     for e in window {
-        game.render(&e);
+        game.update_state();
+
+        if let Some(_) = e.render_args() {
+        	game.render(&e);
+        }
+
+        if let Some(_) = e.resize_args() {
+        	game.resize()
+        }
 
         if let Some(mouse_rel) = e.mouse_cursor_args() {
             game.mouse_move(mouse_rel);
@@ -143,5 +151,6 @@ fn main() {
         if let Some(button) = e.press_args() {
             game.proc_key(button, &e);
         }
+
     }
 }
