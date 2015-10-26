@@ -135,9 +135,9 @@ impl<'a> Game<'a> {
                         Key::H => {
                             match self.ui.proc_key(ParamType::Height) {
                                 Some(h) => {
-                                    self.in_ui = false;
-                                    self.msg.hide();
+                                    self.in_ui = false;                                    
                                     self.field.reinit_field(h, ParamType::Height);
+                                    self.restart();
                                 }
                                 _ => need_redraw = false
                             }
@@ -146,8 +146,8 @@ impl<'a> Game<'a> {
                             match self.ui.proc_key(ParamType::Mines) {
                                 Some(m) => {
                                     self.in_ui = false;
-                                    self.msg.hide();
                                     self.field.reinit_field(m, ParamType::Mines);
+                                    self.restart();
                                 }
                                 _ => need_redraw = false
                             }
@@ -156,8 +156,8 @@ impl<'a> Game<'a> {
                             match self.ui.proc_key(ParamType::Width) {
                                 Some(w) => {
                                     self.in_ui = false;
-                                    self.msg.hide();
                                     self.field.reinit_field(w, ParamType::Width);
+                                    self.restart();
                                 }
                                 _ => need_redraw = false
                             }
