@@ -140,6 +140,10 @@ fn main() {
         	game.render(&e);
         }
 
+        if let Some(_) = e.resize_args() {
+        	game.resize()
+        }
+
         if let Some(mouse_rel) = e.mouse_cursor_args() {
             game.mouse_move(mouse_rel);
         }

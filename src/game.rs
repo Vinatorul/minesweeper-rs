@@ -346,6 +346,10 @@ impl<'a> Game<'a> {
         }
     }
 
+    pub fn resize(&mut self) {
+        self.render_state.reset();
+    }
+
     fn restart(&mut self) {
         self.game_ended = false;
         self.msg.hide();
