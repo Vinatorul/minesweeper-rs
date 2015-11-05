@@ -17,6 +17,22 @@ struct Cell {
 }
 
 impl Cell {
+    fn create_empty() -> Cell {
+        Cell {
+            content: Content::None,
+            revealed: false,
+            marked: false
+        }
+    }
+
+    fn create_with_mine() -> Cell {
+        Cell {
+            content: Content::Mine(false),
+            revealed: false,
+            marked: false
+        }   
+    }
+
     pub fn clear(&mut self) {
         self.content = Content::None;
         self.revealed = false;
@@ -43,6 +59,7 @@ pub struct Field {
     selected_y: u32,
     nubmers_total: u32,
     nubmers_opened: u32,
+    need_regen: bool
 }
 
 impl Field {
@@ -56,35 +73,75 @@ impl Field {
             selected_x: width/2,
             selected_y: height/2,
             nubmers_total: 0,
-            nubmers_opened: 0
+            nubmers_opened: 0,
+            need_regen: true,
         };
         field.reinit_vec();
-        field.fill();
         field
+    }
+
+    pub fn restart(&mut self) {
+        self.need_regen = true;
+        self.reinit_vec();
     }
 
     fn reinit_vec(&mut self) {
         self.cells.clear();
         self.size = self.width*self.height;
         for _i in 0..self.size {
-            self.cells.push(Cell{content: Content::None,
-                                 revealed: false,
-                                 marked: false});
+            self.cells.push(Cell::create_empty());
         }
         self.selected_x = self.width/2;
         self.selected_y = self.height/2;
     }
 
-    fn fill(&mut self) {
+    fn reset(&mut self, cursor_ind:u32) {
         self.clear();
+
+        let cursor_near_cells = self.get_near_cells_ids(cursor_ind);
+
+        // reinit cells with mines
+        let mut new_cells = Vec::new();
+        for i in 0..self.size - cursor_near_cells.len() as u32 {
+            let cell = if i < self.mines {
+                Cell::create_with_mine()
+            } else { 
+                Cell::create_empty()
+            };
+
+            new_cells.push(cell);
+        }
+
+        // shuffle them
         let mut rng = rand::thread_rng(); 
-        let mut shuffled_idx : Vec<u32> = (0..self.size).collect();
-        rng.shuffle(&mut shuffled_idx);
-        let v: Vec<&u32>  = shuffled_idx.iter()
-            .take(self.mines as usize)
-            .inspect(|&idx| self.get_cell_mut(*idx).content = Content::Mine(false))
-            .collect(); // collect is required due to lazy eval (i think).
-        self.mines = v.len() as u32;
+        rng.shuffle(&mut new_cells);
+
+        // push empty cells near with cursor to avoid mines in this positions
+        for ind in cursor_near_cells {
+            new_cells.insert(ind as usize, Cell::create_empty());
+        }
+
+        self.cells = new_cells;
+
+        self.write_numbers_near_mines();
+        self.need_regen = false;
+    }
+
+    fn get_near_cells_ids(&mut self, ind:u32) -> Vec<u32> {
+        let (begin_x, end_x, begin_y, end_y) = self.get_3x3_bounds(ind);
+        
+        let mut cursor_neighbor_cells = Vec::new();
+        for yi in begin_y .. end_y + 1 {
+            for xi in begin_x .. end_x + 1 {
+                let ind = self.get_cell_index(xi, yi);
+                cursor_neighbor_cells.push(ind);
+            }
+        }
+
+        cursor_neighbor_cells
+    }
+
+    fn write_numbers_near_mines(&mut self) {
         let mut i: i32 = -1;
         let w = self.width as i32;
         while i < (self.size - 1) as i32 {
@@ -124,17 +181,13 @@ impl Field {
         x + y * self.width
     }
 
+    // return coordinates of cell (x, y) by index in field
     pub fn get_coord(&mut self, ind: u32) -> (u32, u32){
         (ind % self.width, ind / self.width)
     }
 
-    pub fn get_neighborhood_count(&mut self, i: u32) -> u8 {
-        let (x, y) = self.get_coord(i);
-        
-        let begin_x = if x > 0 { x - 1 } else { x };
-        let end_x = if x + 1 < self.width { x + 1 } else { x };
-        let begin_y = if y > 0 { y - 1 } else { y };
-        let end_y = if y + 1 < self.height { y + 1 } else { y };
+    pub fn get_neighborhood_count(&mut self, ind: u32) -> u8 {
+        let (begin_x, end_x, begin_y, end_y) = self.get_3x3_bounds(ind);
 
         let mut marked_count = 0u8;
         for yi in begin_y .. end_y + 1 {
@@ -147,6 +200,18 @@ impl Field {
         }
 
         marked_count
+    }
+
+    // return (begin_x, end_x, begin_y, end_y) for specified position in field
+    fn get_3x3_bounds(&mut self, ind: u32) -> (u32, u32, u32, u32) {
+        let (x, y) = self.get_coord(ind);
+        
+        let begin_x = if x > 0 { x - 1 } else { x };
+        let end_x = if x + 1 < self.width { x + 1 } else { x };
+        let begin_y = if y > 0 { y - 1 } else { y };
+        let end_y = if y + 1 < self.height { y + 1 } else { y };
+
+        (begin_x, end_x, begin_y, end_y)
     }
 
     fn clear(&mut self) {
@@ -230,8 +295,10 @@ impl Field {
         self.size
     }
 
-    pub fn restart(&mut self) {
-        self.fill();
+    pub fn reset_if_need(&mut self, cursor_ind:u32) {
+        if self.need_regen {
+            self.reset(cursor_ind);
+        }
     } 
 
     pub fn reveal_all(&mut self) {

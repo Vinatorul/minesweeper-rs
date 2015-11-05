@@ -254,6 +254,8 @@ impl<'a> Game<'a> {
             self.game_start = Some(UTC::now()); 
         }
 
+        self.field.reset_if_need(i);
+
         if !self.field.revealed(i) {
             self.check_reveal(i);
         } else {
