@@ -38,7 +38,7 @@ Defeat (red cells are missed mines)
 
 ## Compiling
 
-Follow these instructions to compile `cargo-count`, then skip down to Installation.
+Follow these instructions to compile `minesweeper-rs`.
 
  1. Clone the project `$ git clone https://github.com/Vinatorul/minesweeper-rs && cd minesweeper-rs`
  2. Build the project `$ cargo build --release` (**NOTE:** There is a large performance differnce when compiling without optimizations, so I recommend alwasy using `--release` to enable to them)
