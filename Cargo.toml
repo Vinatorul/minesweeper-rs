@@ -1,6 +1,6 @@
 [package]
 name = "minesweeper"
-version = "1.2.0"
+version = "1.2.1"
 authors = ["Alexander Kuvaev <alexander@kuvaev.me>"]
 description = "Simple minesweeper in Rust"
 repository = "https://github.com/Vinatorul/minesweeper-rs.git"
@@ -9,8 +9,8 @@ license = "MIT"
 keywords = ["minesweeper", "game"]
 
 [dependencies]
-piston_window = "~0.25.0"
-clap = "^1.4"
+piston_window = "~0.33.0"
+clap = "^1.5"
 rand = "^0.3"
 find_folder = "^0.3"
 chrono = "^0.2"
