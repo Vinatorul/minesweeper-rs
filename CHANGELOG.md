@@ -1,3 +1,13 @@
+<a name="v1.2.1"></a>
+##  (2016-01-05)
+
+
+#### Improvements
+
+*   Reimplementation of field generation to avoid game over on first click after game beginning ([0723d12c](https://github.com/Vinatorul/minesweeper-rs/commit/0723d12c42c78c169723414ad72b5dd3575a0163))
+
+
+
 <a name="v1.2"></a>
 ##  (2015-10-26)
 
