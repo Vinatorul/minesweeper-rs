@@ -151,7 +151,7 @@ impl<'a> UI<'a> {
 
         text([1.0, 1.0, 1.0, 1.0],
              20,
-             &*format!("{}:{}", mins, rem_seconds),
+             &*format!("{}:{:02}", mins, rem_seconds),
              glyps,
              transform,
              graphics);
