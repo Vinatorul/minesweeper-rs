@@ -123,7 +123,7 @@ fn main() {
         .opengl(opengl)
         .exit_on_esc(true)
         .build()
-        .unwrap();
+        .expect("Try running with --oldOGL");
 
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets").unwrap();
