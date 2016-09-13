@@ -2,17 +2,17 @@
 pub enum ParamType {
     Width,
     Height,
-    Mines
+    Mines,
 }
 
 pub enum MoveDestination {
     Up,
     Down,
     Left,
-    Right
+    Right,
 }
 
 pub enum GameEndState {
     Win,
-    Lose
+    Lose,
 }

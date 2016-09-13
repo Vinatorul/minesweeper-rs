@@ -3,7 +3,7 @@ use ui::UI;
 use ui::EndMessage;
 use piston_window::*;
 use common::{ParamType, MoveDestination, GameEndState};
-use chrono::{DateTime, UTC, Duration};  
+use chrono::{DateTime, UTC, Duration};
 
 enum RenderState {
     // redraw picture on current buffer
@@ -13,17 +13,16 @@ enum RenderState {
     Second,
 
     // needn't redraw picture
-    None
+    None,
 }
 
 impl RenderState {
-
     // Update render state and return flag necessity of redrawing pickture
     fn update_state(&mut self) -> bool {
         match *self {
-            RenderState::First  => *self = RenderState::Second,
+            RenderState::First => *self = RenderState::Second,
             RenderState::Second => *self = RenderState::None,
-            RenderState::None   => return false
+            RenderState::None => return false,
         }
 
         true
@@ -44,11 +43,11 @@ pub struct Game<'a> {
     game_ended: bool,
     panel_width: u32,
     in_ui: bool,
-    game_start : Option<DateTime<UTC>>,
-    last_time : Option<DateTime<UTC>>,
-    game_end : Option<DateTime<UTC>>,
+    game_start: Option<DateTime<UTC>>,
+    last_time: Option<DateTime<UTC>>,
+    game_end: Option<DateTime<UTC>>,
     // state of rendering for drawing picture on both buffers
-    render_state: RenderState
+    render_state: RenderState,
 }
 
 impl<'a> Game<'a> {
@@ -66,11 +65,11 @@ impl<'a> Game<'a> {
             game_start: None,
             game_end: None,
             last_time: None,
-            render_state: RenderState::First
+            render_state: RenderState::First,
         }
     }
 
-    pub fn render(&mut self, window: &PistonWindow) {      
+    pub fn render(&mut self, window: &PistonWindow) {
         if !self.render_state.update_state() {
             return;
         }
@@ -83,14 +82,22 @@ impl<'a> Game<'a> {
             let ui_rect = self.get_ui_rect(window);
 
             let dur = match self.game_start {
-                Some(game_start) => match self.game_end {
-                    Some(game_end) => game_end - game_start,
-                    None => UTC::now() - game_start,
-                },
+                Some(game_start) => {
+                    match self.game_end {
+                        Some(game_end) => game_end - game_start,
+                        None => UTC::now() - game_start,
+                    }
+                }
                 None => Duration::seconds(0), 
             };
 
-            self.ui.draw(c, g, ui_rect, &mut self.glyphs, self.field.total_mines(), self.field.count_marked(), dur);
+            self.ui.draw(c,
+                         g,
+                         ui_rect,
+                         &mut self.glyphs,
+                         self.field.total_mines(),
+                         self.field.count_marked(),
+                         dur);
 
             let msg_rect = self.get_msg_rect(window);
             self.msg.draw(c, g, msg_rect, &mut self.glyphs);
@@ -99,31 +106,26 @@ impl<'a> Game<'a> {
 
     fn get_field_rect(&self, window: &PistonWindow) -> [u32; 4] {
         let mut w = window.size().width - self.panel_width;
-        w = (w /self.field.get_width()) * self.field.get_width();
+        w = (w / self.field.get_width()) * self.field.get_width();
         let mut h = window.size().height;
-        h = (h /self.field.get_height()) * self.field.get_height();
+        h = (h / self.field.get_height()) * self.field.get_height();
         [0, 0, w, h]
     }
 
     fn get_ui_rect(&self, window: &PistonWindow) -> [u32; 4] {
         let mut field_w = window.size().width - self.panel_width;
-        field_w = (field_w /self.field.get_width()) * self.field.get_width();
+        field_w = (field_w / self.field.get_width()) * self.field.get_width();
         let w = window.size().width - field_w;
         let h = window.size().height;
         [field_w, 0, w, h]
     }
-    
+
     fn get_msg_rect(&self, window: &PistonWindow) -> [u32; 4] {
         let w_w = window.size().width;
         let w_h = window.size().height;
         let (m_w, m_h) = EndMessage::size();
 
-        [
-            ( (w_w-m_w) / 2 ),
-            ( (w_h-m_h) / 2 ),
-            m_w,
-            m_h        
-        ]
+        [((w_w - m_w) / 2), ((w_h - m_h) / 2), m_w, m_h]
     }
 
     pub fn proc_key(&mut self, button: Button, window: &PistonWindow) {
@@ -131,17 +133,17 @@ impl<'a> Game<'a> {
         if self.in_ui {
             match button {
                 Button::Keyboard(key) => {
-                    match  key {
+                    match key {
                         Key::H => {
                             match self.ui.proc_key(ParamType::Height) {
                                 Some(h) => {
-                                    self.in_ui = false;                                    
+                                    self.in_ui = false;
                                     self.field.reinit_field(h, ParamType::Height);
                                     self.restart();
                                 }
-                                _ => need_redraw = false
+                                _ => need_redraw = false,
                             }
-                        },
+                        }
                         Key::M => {
                             match self.ui.proc_key(ParamType::Mines) {
                                 Some(m) => {
@@ -149,9 +151,9 @@ impl<'a> Game<'a> {
                                     self.field.reinit_field(m, ParamType::Mines);
                                     self.restart();
                                 }
-                                _ => need_redraw = false
+                                _ => need_redraw = false,
                             }
-                        },
+                        }
                         Key::W => {
                             match self.ui.proc_key(ParamType::Width) {
                                 Some(w) => {
@@ -159,17 +161,17 @@ impl<'a> Game<'a> {
                                     self.field.reinit_field(w, ParamType::Width);
                                     self.restart();
                                 }
-                                _ => need_redraw = false
+                                _ => need_redraw = false,
                             }
-                        },
+                        }
                         Key::Up => self.ui.change_selected(MoveDestination::Up),
                         Key::Down => self.ui.change_selected(MoveDestination::Down),
                         Key::Left => self.ui.change_selected(MoveDestination::Left),
                         Key::Right => self.ui.change_selected(MoveDestination::Right),
-                        _ => need_redraw = false
+                        _ => need_redraw = false,
                     }
                 }
-                _ => need_redraw = false
+                _ => need_redraw = false,
             }
         } else {
             match button {
@@ -183,7 +185,7 @@ impl<'a> Game<'a> {
                         Key::Space => {
                             let ind = self.field.get_selected_ind();
                             self.open_cell(ind);
-                        },
+                        }
                         Key::LCtrl | Key::RCtrl => {
                             let ind = self.field.get_selected_ind();
                             self.toggle_mark(ind);
@@ -191,18 +193,18 @@ impl<'a> Game<'a> {
                         Key::H => {
                             self.ui.proc_key(ParamType::Height);
                             self.in_ui = true;
-                        },
-                        Key::M =>{
+                        }
+                        Key::M => {
                             self.ui.proc_key(ParamType::Mines);
                             self.in_ui = true;
-                        },
+                        }
                         Key::W => {
                             self.ui.proc_key(ParamType::Width);
                             self.in_ui = true;
-                        },
-                        _ => need_redraw = false
+                        }
+                        _ => need_redraw = false,
                     }
-                },
+                }
                 Button::Mouse(btn) => {
                     let field_rect = self.get_field_rect(window);
                     let cell_w = field_rect[2] / self.field.get_width();
@@ -210,7 +212,8 @@ impl<'a> Game<'a> {
                     let mouse_x = self.mouse_x.floor() as u32;
                     let mouse_y = self.mouse_y.floor() as u32;
                     if (mouse_x < field_rect[0]) || (mouse_x > field_rect[0] + field_rect[2]) ||
-                       (mouse_y < field_rect[1]) || (mouse_y > field_rect[1] + field_rect[3]) {
+                       (mouse_y < field_rect[1]) ||
+                       (mouse_y > field_rect[1] + field_rect[3]) {
                         return;
                     }
                     let x = (mouse_x - field_rect[0]) / cell_w;
@@ -218,13 +221,13 @@ impl<'a> Game<'a> {
                     let w = self.field.get_width();
                     match btn {
                         MouseButton::Left => {
-                            self.open_cell(x + y*w);
-                        },
+                            self.open_cell(x + y * w);
+                        }
                         MouseButton::Right => {
 
-                            self.toggle_mark(x + y*w);
-                        },
-                        _ => need_redraw = false
+                            self.toggle_mark(x + y * w);
+                        }
+                        _ => need_redraw = false,
                     }
                 }
                 Button::Joystick(_) => {
@@ -251,7 +254,7 @@ impl<'a> Game<'a> {
             return;
         }
         if self.game_start == None {
-            self.game_start = Some(UTC::now()); 
+            self.game_start = Some(UTC::now());
         }
 
         self.field.reset_if_need(i);
@@ -275,7 +278,7 @@ impl<'a> Game<'a> {
         if let Some(cells_count) = cells_count_opt {
             if self.field.get_neighborhood_count(i) == cells_count {
                 let on_left_edge = i % self.field.get_width() == 0;
-                let on_right_edge = (i+1) % self.field.get_width() == 0; 
+                let on_right_edge = (i + 1) % self.field.get_width() == 0;
 
                 for rdelta in -1..2i32 {
                     for cdelta in -1..2i32 {
@@ -285,7 +288,7 @@ impl<'a> Game<'a> {
                         if on_right_edge && (cdelta == 1) {
                             continue;
                         }
-                        let tgt = (i as i32) + rdelta*(self.field.get_width() as i32) + cdelta;
+                        let tgt = (i as i32) + rdelta * (self.field.get_width() as i32) + cdelta;
                         if (tgt < 0) || (tgt >= self.field.get_size() as i32) {
                             continue;
                         }
@@ -296,7 +299,7 @@ impl<'a> Game<'a> {
         }
     }
 
-    pub fn check_reveal(&mut self, i : u32) {
+    pub fn check_reveal(&mut self, i: u32) {
         if self.field.marked(i) {
             return;
         }
@@ -305,26 +308,26 @@ impl<'a> Game<'a> {
                 self.field.reveal_all();
                 self.game_ended = true;
                 self.field.set_killer(i);
-                self.game_end = Some(UTC::now()); 
-                self.msg.show( GameEndState::Lose );
+                self.game_end = Some(UTC::now());
+                self.msg.show(GameEndState::Lose);
                 println!("Game over :(");
-            },
+            }
             Content::None => {
                 self.field.chain_reveal(i);
                 if self.field.is_victory() {
-                    self.msg.show( GameEndState::Win );
+                    self.msg.show(GameEndState::Win);
                     println!("You win :)");
                     self.game_ended = true;
-                    self.game_end = Some(UTC::now()); 
+                    self.game_end = Some(UTC::now());
                 }
             }
             Content::Number(_i) => {
                 if self.field.is_victory() {
-                    self.msg.show( GameEndState::Win );
+                    self.msg.show(GameEndState::Win);
                     println!("You win :)");
                     self.game_ended = true;
-                    self.game_end = Some(UTC::now()); 
-                } 
+                    self.game_end = Some(UTC::now());
+                }
             }
         }
     }
@@ -345,7 +348,7 @@ impl<'a> Game<'a> {
                             self.last_time = Some(now);
                             self.render_state.reset();
                         }
-                    },
+                    }
                     None => self.last_time = Some(now),
                 }
             }
@@ -360,7 +363,7 @@ impl<'a> Game<'a> {
         self.game_ended = false;
         self.msg.hide();
         self.game_start = None;
-        self.game_end = None; 
+        self.game_end = None;
         self.last_time = None;
         self.field.restart();
         self.render_state.reset();

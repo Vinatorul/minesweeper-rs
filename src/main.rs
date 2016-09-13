@@ -118,15 +118,15 @@ fn main() {
         opengl = OpenGL::V2_1;
     }
 
-    let mut window: PistonWindow =
-        WindowSettings::new("Minesweeper", [width, height])
+    let mut window: PistonWindow = WindowSettings::new("Minesweeper", [width, height])
         .opengl(opengl)
         .exit_on_esc(true)
         .build()
         .expect("Try running with --oldOGL");
 
     let assets = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets").unwrap();
+        .for_folder("assets")
+        .unwrap();
     let ref font = assets.join("FiraSans-Regular.ttf");
     let factory = window.factory.borrow().clone();
     let glyphs = Glyphs::new(font, factory).unwrap();
@@ -137,11 +137,11 @@ fn main() {
         game.update_state();
 
         if let Some(_) = e.render_args() {
-        	game.render(&e);
+            game.render(&e);
         }
 
         if let Some(_) = e.resize_args() {
-        	game.resize()
+            game.resize()
         }
 
         if let Some(mouse_rel) = e.mouse_cursor_args() {
