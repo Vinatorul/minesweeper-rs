@@ -21,7 +21,7 @@ impl Cell {
         Cell {
             content: Content::None,
             revealed: false,
-            marked: false
+            marked: false,
         }
     }
 
@@ -29,15 +29,15 @@ impl Cell {
         Cell {
             content: Content::Mine(false),
             revealed: false,
-            marked: false
-        }   
+            marked: false,
+        }
     }
 
     pub fn clear(&mut self) {
         self.content = Content::None;
         self.revealed = false;
         self.marked = false;
-    }   
+    }
 
     fn reveal(&mut self) -> &Content {
         self.revealed = true;
@@ -59,7 +59,7 @@ pub struct Field {
     selected_y: u32,
     nubmers_total: u32,
     nubmers_opened: u32,
-    need_regen: bool
+    need_regen: bool,
 }
 
 impl Field {
@@ -69,9 +69,9 @@ impl Field {
             height: height,
             cells: vec![],
             mines: mines,
-            size: width*height,
-            selected_x: width/2,
-            selected_y: height/2,
+            size: width * height,
+            selected_x: width / 2,
+            selected_y: height / 2,
             nubmers_total: 0,
             nubmers_opened: 0,
             need_regen: true,
@@ -87,15 +87,15 @@ impl Field {
 
     fn reinit_vec(&mut self) {
         self.cells.clear();
-        self.size = self.width*self.height;
+        self.size = self.width * self.height;
         for _i in 0..self.size {
             self.cells.push(Cell::create_empty());
         }
-        self.selected_x = self.width/2;
-        self.selected_y = self.height/2;
+        self.selected_x = self.width / 2;
+        self.selected_y = self.height / 2;
     }
 
-    fn reset(&mut self, cursor_ind:u32) {
+    fn reset(&mut self, cursor_ind: u32) {
         self.clear();
 
         let cursor_near_cells = self.get_near_cells_ids(cursor_ind);
@@ -105,7 +105,7 @@ impl Field {
         for i in 0..self.size - cursor_near_cells.len() as u32 {
             let cell = if i < self.mines {
                 Cell::create_with_mine()
-            } else { 
+            } else {
                 Cell::create_empty()
             };
 
@@ -113,7 +113,7 @@ impl Field {
         }
 
         // shuffle them
-        let mut rng = rand::thread_rng(); 
+        let mut rng = rand::thread_rng();
         rng.shuffle(&mut new_cells);
 
         // push empty cells near with cursor to avoid mines in this positions
@@ -127,12 +127,12 @@ impl Field {
         self.need_regen = false;
     }
 
-    fn get_near_cells_ids(&mut self, ind:u32) -> Vec<u32> {
+    fn get_near_cells_ids(&mut self, ind: u32) -> Vec<u32> {
         let (begin_x, end_x, begin_y, end_y) = self.get_3x3_bounds(ind);
-        
+
         let mut cursor_neighbor_cells = Vec::new();
-        for yi in begin_y .. end_y + 1 {
-            for xi in begin_x .. end_x + 1 {
+        for yi in begin_y..end_y + 1 {
+            for xi in begin_x..end_x + 1 {
                 let ind = self.get_cell_index(xi, yi);
                 cursor_neighbor_cells.push(ind);
             }
@@ -151,27 +151,29 @@ impl Field {
                     let ct_mine = |b| {
                         match b {
                             true => 1,
-                            false => 0
+                            false => 0,
                         }
                     };
-                     // don`t care about row
-                    let mut ct = ct_mine(self.is_mine_safe(i-w)) +
-                                 ct_mine(self.is_mine_safe(i+w));
-                    if i % w > 0 { // check left side position
-                        ct += ct_mine(self.is_mine_safe(i-w-1)) +
-                              ct_mine(self.is_mine_safe(i-1)) +
-                              ct_mine(self.is_mine_safe(i+w-1));
+                    // don`t care about row
+                    let mut ct = ct_mine(self.is_mine_safe(i - w)) +
+                                 ct_mine(self.is_mine_safe(i + w));
+                    if i % w > 0 {
+                        // check left side position
+                        ct += ct_mine(self.is_mine_safe(i - w - 1)) +
+                              ct_mine(self.is_mine_safe(i - 1)) +
+                              ct_mine(self.is_mine_safe(i + w - 1));
                     }
-                    if i % w < w - 1 { // check right side position
-                        ct += ct_mine(self.is_mine_safe(i-w+1)) +
-                              ct_mine(self.is_mine_safe(i+1)) +
-                              ct_mine(self.is_mine_safe(i+w+1));
+                    if i % w < w - 1 {
+                        // check right side position
+                        ct += ct_mine(self.is_mine_safe(i - w + 1)) +
+                              ct_mine(self.is_mine_safe(i + 1)) +
+                              ct_mine(self.is_mine_safe(i + w + 1));
                     }
                     if ct > 0 {
                         self.get_cell_mut(i as u32).content = Content::Number(ct);
                         self.nubmers_total += 1;
                     }
-                },
+                }
                 _ => {}
             }
         }
@@ -182,7 +184,7 @@ impl Field {
     }
 
     // return coordinates of cell (x, y) by index in field
-    pub fn get_coord(&mut self, ind: u32) -> (u32, u32){
+    pub fn get_coord(&mut self, ind: u32) -> (u32, u32) {
         (ind % self.width, ind / self.width)
     }
 
@@ -190,8 +192,8 @@ impl Field {
         let (begin_x, end_x, begin_y, end_y) = self.get_3x3_bounds(ind);
 
         let mut marked_count = 0u8;
-        for yi in begin_y .. end_y + 1 {
-            for xi in begin_x .. end_x + 1 {
+        for yi in begin_y..end_y + 1 {
+            for xi in begin_x..end_x + 1 {
                 let ind = self.get_cell_index(xi, yi);
                 if self.marked(ind) {
                     marked_count += 1;
@@ -205,11 +207,27 @@ impl Field {
     // return (begin_x, end_x, begin_y, end_y) for specified position in field
     fn get_3x3_bounds(&mut self, ind: u32) -> (u32, u32, u32, u32) {
         let (x, y) = self.get_coord(ind);
-        
-        let begin_x = if x > 0 { x - 1 } else { x };
-        let end_x = if x + 1 < self.width { x + 1 } else { x };
-        let begin_y = if y > 0 { y - 1 } else { y };
-        let end_y = if y + 1 < self.height { y + 1 } else { y };
+
+        let begin_x = if x > 0 {
+            x - 1
+        } else {
+            x
+        };
+        let end_x = if x + 1 < self.width {
+            x + 1
+        } else {
+            x
+        };
+        let begin_y = if y > 0 {
+            y - 1
+        } else {
+            y
+        };
+        let end_y = if y + 1 < self.height {
+            y + 1
+        } else {
+            y
+        };
 
         (begin_x, end_x, begin_y, end_y)
     }
@@ -240,20 +258,22 @@ impl Field {
     }
 
     pub fn set_killer(&mut self, i: u32) {
-        self.get_cell_mut(i).content = Content::Mine(true); 
+        self.get_cell_mut(i).content = Content::Mine(true);
     }
 
-    fn get_cell_mut(&mut self, i:u32) -> &mut Cell {
-        self.cells.get_mut(i as usize)
+    fn get_cell_mut(&mut self, i: u32) -> &mut Cell {
+        self.cells
+            .get_mut(i as usize)
             .unwrap_or_else(|| panic!("Range check error at Field::get_cell_mut ({})", i))
     }
 
-    fn get_cell(& self, i:u32) -> &Cell {
-        self.cells.get(i as usize)
+    fn get_cell(&self, i: u32) -> &Cell {
+        self.cells
+            .get(i as usize)
             .unwrap_or_else(|| panic!("Range check error at Field::get_cell ({})", i))
     }
 
-    fn get_content_safe(&self, i:i32) -> Option<&Content> {
+    fn get_content_safe(&self, i: i32) -> Option<&Content> {
         if (i < 0) || ((i as u32) >= self.size) {
             None
         } else {
@@ -261,25 +281,24 @@ impl Field {
         }
     }
 
-    pub fn get_content(& self, i: u32) -> &Content {
+    pub fn get_content(&self, i: u32) -> &Content {
         &self.get_cell(i).content
     }
 
     pub fn count_marked(&self) -> u32 {
-        (0..self.size)
-            .fold(0, |acc, i:u32| {
-                if self.marked(i) {
-                    acc + 1
-                } else {
-                    acc
-                }
-            })
+        (0..self.size).fold(0, |acc, i: u32| {
+            if self.marked(i) {
+                acc + 1
+            } else {
+                acc
+            }
+        })
     }
 
     fn is_mine_safe(&self, i: i32) -> bool {
         match self.get_content_safe(i) {
             Some(&Content::Mine(_)) => true,
-            _ => false
+            _ => false,
         }
     }
 
@@ -295,16 +314,16 @@ impl Field {
         self.size
     }
 
-    pub fn reset_if_need(&mut self, cursor_ind:u32) {
+    pub fn reset_if_need(&mut self, cursor_ind: u32) {
         if self.need_regen {
             self.reset(cursor_ind);
         }
-    } 
+    }
 
     pub fn reveal_all(&mut self) {
         for i in 0..self.size {
             self.get_cell_mut(i).revealed = true;
-        }  
+        }
     }
 
     pub fn chain_reveal(&mut self, u: u32) {
@@ -321,13 +340,13 @@ impl Field {
                         self.get_cell_mut(x as u32).marked = false;
                         self.reveal(x as u32);
                     }
-                },
+                }
                 Some(&Content::Number(_n)) => {
                     if !(self.revealed(x as u32)) {
                         self.get_cell_mut(x as u32).marked = false;
                         self.reveal(x as u32);
                     }
-                },
+                }
                 _ => {}
             }
         };
@@ -338,44 +357,44 @@ impl Field {
         while !deq.is_empty() {
             let i = deq.pop_front().unwrap();
             // don`t care about row
-            check(i-w, deq);
-            check(i+w, deq);
-            if i % w > 0 { // check left side position
-                check(i-w-1, deq);
-                check(i-1, deq);
-                check(i+w-1, deq);
+            check(i - w, deq);
+            check(i + w, deq);
+            if i % w > 0 {
+                // check left side position
+                check(i - w - 1, deq);
+                check(i - 1, deq);
+                check(i + w - 1, deq);
             }
-            if i % w < w - 1 { // check right side position
-                check(i-w+1, deq);
-                check(i+1, deq);
-                check(i+w+1, deq);
+            if i % w < w - 1 {
+                // check right side position
+                check(i - w + 1, deq);
+                check(i + 1, deq);
+                check(i + w + 1, deq);
             }
         }
     }
 
     pub fn draw(&mut self,
-            context: Context,
-            graphics: &mut G2d,
-            field_rect: [u32; 4],
-            glyps: &mut Glyphs)
-    {
+                context: Context,
+                graphics: &mut G2d,
+                field_rect: [u32; 4],
+                glyps: &mut Glyphs) {
         let cell_w = field_rect[2] / self.get_width();
         let cell_h = field_rect[3] / self.get_height();
         for i in 0..self.get_width() {
             for j in 0..self.get_height() {
-                let ind = i + j*self.get_width();
-                let transform = context.transform.trans((field_rect[0] + i*cell_w) as f64 + 5.0,
-                                                        (field_rect[1] + (j+1)*cell_h) as f64 - 5.0);
+                let ind = i + j * self.get_width();
+                let transform = context.transform.trans((field_rect[0] + i * cell_w) as f64 + 5.0,
+                                                        (field_rect[1] + (j + 1) * cell_h) as f64 -
+                                                        5.0);
                 if self.revealed(ind) {
-                    match *self.get_content(i + j*self.get_width()) {
+                    match *self.get_content(i + j * self.get_width()) {
                         Content::Mine(killer) => {
                             rectangle([1.0, 0.0, 0.0, 1.0],
-                                      [
-                                        (field_rect[0] + i*cell_w) as f64,
-                                        (field_rect[1] + j*cell_h) as f64,
-                                        cell_w as f64,
-                                        cell_h as f64
-                                      ],
+                                      [(field_rect[0] + i * cell_w) as f64,
+                                       (field_rect[1] + j * cell_h) as f64,
+                                       cell_w as f64,
+                                       cell_h as f64],
                                       context.transform,
                                       graphics);
                             if killer {
@@ -386,15 +405,13 @@ impl Field {
                                      transform,
                                      graphics);
                             }
-                        },
+                        }
                         Content::Number(n) => {
                             rectangle(color::hex("c0c0c0"),
-                                      [
-                                        (field_rect[0] + i*cell_w) as f64,
-                                        (field_rect[1] + j*cell_h) as f64,
-                                        cell_w as f64,
-                                        cell_h as f64
-                                      ],
+                                      [(field_rect[0] + i * cell_w) as f64,
+                                       (field_rect[1] + j * cell_h) as f64,
+                                       cell_w as f64,
+                                       cell_h as f64],
                                       context.transform,
                                       graphics);
 
@@ -407,7 +424,7 @@ impl Field {
                                 6 => color::hex("008080"),
                                 7 => color::hex("000000"),
                                 8 => color::hex("808080"),
-                                _ => [0.0, 0.0, 0.0, 1.0]
+                                _ => [0.0, 0.0, 0.0, 1.0],
                             };
                             text(text_color,
                                  cell_h,
@@ -415,15 +432,13 @@ impl Field {
                                  glyps,
                                  transform,
                                  graphics);
-                        },
+                        }
                         Content::None => {
                             rectangle(color::hex("c0c0c0"),
-                                      [
-                                        (field_rect[0] + i*cell_w) as f64,
-                                        (field_rect[1] + j*cell_h) as f64,
-                                        cell_w as f64,
-                                        cell_h as f64
-                                      ],
+                                      [(field_rect[0] + i * cell_w) as f64,
+                                       (field_rect[1] + j * cell_h) as f64,
+                                       cell_w as f64,
+                                       cell_h as f64],
                                       context.transform,
                                       graphics);
                         }
@@ -431,58 +446,48 @@ impl Field {
                 } else {
                     // non revealed
                     rectangle(color::hex("303030"),
-                              [
-                                (field_rect[0] + i*cell_w) as f64,
-                                (field_rect[1] + j*cell_h) as f64,
-                                cell_w as f64,
-                                cell_h as f64
-                              ],
+                              [(field_rect[0] + i * cell_w) as f64,
+                               (field_rect[1] + j * cell_h) as f64,
+                               cell_w as f64,
+                               cell_h as f64],
                               context.transform,
                               graphics);
                 }
                 if self.marked(ind) {
                     rectangle([0.0, 1.0, 0.0, 0.75],
-                              [
-                                (field_rect[0] + i*cell_w) as f64,
-                                (field_rect[1] + j*cell_h) as f64,
-                                cell_w as f64,
-                                cell_h as f64
-                              ],
+                              [(field_rect[0] + i * cell_w) as f64,
+                               (field_rect[1] + j * cell_h) as f64,
+                               cell_w as f64,
+                               cell_h as f64],
                               context.transform,
                               graphics);
                 }
             }
         }
         rectangle([0.5, 0.5, 0.5, 0.75],
-                  [
-                    (field_rect[0] + self.selected_x*cell_w) as f64,
-                    (field_rect[1] + self.selected_y*cell_h) as f64,
-                    cell_w as f64,
-                    cell_h as f64
-                  ],
+                  [(field_rect[0] + self.selected_x * cell_w) as f64,
+                   (field_rect[1] + self.selected_y * cell_h) as f64,
+                   cell_w as f64,
+                   cell_h as f64],
                   context.transform,
                   graphics);
         for i in 0..self.get_width() + 1 {
             line([0.5, 0.5, 0.5, 1.0],
                  1.0,
-                 [
-                    (field_rect[0] + i*cell_w) as f64,
-                    field_rect[1] as f64,
-                    (field_rect[0] + i*cell_w) as f64,
-                    (field_rect[1] + field_rect[3]) as f64
-                 ],
+                 [(field_rect[0] + i * cell_w) as f64,
+                  field_rect[1] as f64,
+                  (field_rect[0] + i * cell_w) as f64,
+                  (field_rect[1] + field_rect[3]) as f64],
                  context.transform,
                  graphics);
         }
         for i in 0..self.get_height() + 1 {
             line([0.5, 0.5, 0.5, 1.0],
                  1.0,
-                 [
-                    field_rect[0] as f64,
-                    (field_rect[1] + i*cell_h) as f64,
-                    (field_rect[0] + field_rect[2]) as f64,
-                    (field_rect[1] + i*cell_h) as f64
-                 ],
+                 [field_rect[0] as f64,
+                  (field_rect[1] + i * cell_h) as f64,
+                  (field_rect[0] + field_rect[2]) as f64,
+                  (field_rect[1] + i * cell_h) as f64],
                  context.transform,
                  graphics);
         }
@@ -494,17 +499,17 @@ impl Field {
                 if self.selected_y > 0 {
                     self.selected_y -= 1;
                 }
-            },
+            }
             MoveDestination::Down => {
                 if self.selected_y < self.height - 1 {
                     self.selected_y += 1;
                 }
-            },
+            }
             MoveDestination::Left => {
                 if self.selected_x > 0 {
                     self.selected_x -= 1;
                 }
-            },
+            }
             MoveDestination::Right => {
                 if self.selected_x < self.width - 1 {
                     self.selected_x += 1;
