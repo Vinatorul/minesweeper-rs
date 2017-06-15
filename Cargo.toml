@@ -1,15 +1,20 @@
 [package]
 name = "minesweeper"
-version = "1.2.1"
+version = "1.3.0"
 authors = ["Alexander Kuvaev <alexander@kuvaev.me>"]
 description = "Simple minesweeper in Rust"
 repository = "https://github.com/Vinatorul/minesweeper-rs.git"
 readme = "README.md"
 license = "MIT"
 keywords = ["minesweeper", "game"]
+exclude = [".travis.yml", ".clog.toml"]
+categories = ["games"]
+
+[badges]
+travis-ci = { repository = "Vinatorul/minesweeper-rs" }
 
 [dependencies]
-piston_window = "~0.33.0"
+piston_window = "~0.66.0"
 clap = "^1.5"
 rand = "^0.3"
 find_folder = "^0.3"
