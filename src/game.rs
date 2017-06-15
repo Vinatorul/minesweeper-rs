@@ -69,18 +69,17 @@ impl<'a> Game<'a> {
         }
     }
 
-    pub fn render(&mut self, window: &PistonWindow) {
+    pub fn render(&mut self, window: &mut PistonWindow, e: &Input) {
         if !self.render_state.update_state() {
             return;
         }
 
-        window.draw_2d(|c, g| {
+        let field_rect = self.get_field_rect(window);
+        let ui_rect = self.get_ui_rect(window);
+        let msg_rect = self.get_msg_rect(window);
+        window.draw_2d(e, |c, g| {
             clear([0.0, 0.0, 0.0, 1.0], g);
-            let field_rect = self.get_field_rect(window);
             self.field.draw(c, g, field_rect, &mut self.glyphs);
-
-            let ui_rect = self.get_ui_rect(window);
-
             let dur = match self.game_start {
                 Some(game_start) => {
                     match self.game_end {
@@ -98,8 +97,6 @@ impl<'a> Game<'a> {
                          self.field.total_mines(),
                          self.field.count_marked(),
                          dur);
-
-            let msg_rect = self.get_msg_rect(window);
             self.msg.draw(c, g, msg_rect, &mut self.glyphs);
         });
     }
@@ -230,10 +227,11 @@ impl<'a> Game<'a> {
                         _ => need_redraw = false,
                     }
                 }
-                Button::Joystick(_) => {
+                Button::Controller(_) => {
                     // Doen't work for me (Logitech Rumble F510)
                     // println!("{:?}", btn);
                 }
+
             }
         }
 

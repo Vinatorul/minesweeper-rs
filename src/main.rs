@@ -128,16 +128,16 @@ fn main() {
         .for_folder("assets")
         .unwrap();
     let ref font = assets.join("FiraSans-Regular.ttf");
-    let factory = window.factory.borrow().clone();
+    let factory = window.factory.clone();
     let glyphs = Glyphs::new(font, factory).unwrap();
 
     let mut game = game::Game::new(glyphs, f_width, f_height, mines);
     window.set_max_fps(max_fps);
-    for e in window {
+    while let Some(e) = window.next() {
         game.update_state();
 
         if let Some(_) = e.render_args() {
-            game.render(&e);
+            game.render(&mut window, &e);
         }
 
         if let Some(_) = e.resize_args() {
@@ -149,7 +149,7 @@ fn main() {
         }
 
         if let Some(button) = e.press_args() {
-            game.proc_key(button, &e);
+            game.proc_key(button, &window);
         }
 
     }
